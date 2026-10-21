@@ -1,0 +1,26 @@
+# Maven
+target/
+*.class
+
+# macOS
+.DS_Store
+._*
+.AppleDouble
+.LSOverride
+
+# NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# Logs
+*.log
+
+# Word temp
+~$*

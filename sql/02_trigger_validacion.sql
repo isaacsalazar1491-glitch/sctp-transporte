@@ -1,0 +1,1 @@
+-- Triggers: Cambio de estado de unidad ante incidencia grave y validaciones

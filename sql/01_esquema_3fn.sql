@@ -1,0 +1,1 @@
+-- Esquema en 3FN: Definicion de tablas, llaves primarias, foraneas y restricciones

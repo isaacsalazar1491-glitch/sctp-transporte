@@ -1,0 +1,1 @@
+-- Datos iniciales / de prueba (Seeds) para exposicion
