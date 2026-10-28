@@ -7,7 +7,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class ConexionBD {
+public class ConexionBD
+{
 
     private static final Properties props = new Properties();
     private static final String URL;
@@ -15,9 +16,11 @@ public class ConexionBD {
     private static final String PASSWORD;
     private static final String DATABASE;
 
-    static {
+    static
+    {
         try (InputStream input = ConexionBD.class.getClassLoader().getResourceAsStream("db.properties")) {
-            if (input == null) {
+            if (input == null)
+            {
                 throw new RuntimeException("No se encontró el archivo db.properties en src/main/resources");
             }
             props.load(input);
@@ -29,21 +32,27 @@ public class ConexionBD {
             URL = "jdbc:postgresql://" + host + ":" + port + "/" + DATABASE;
 
             Class.forName("org.postgresql.Driver");
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e)
+        {
             throw new ExceptionInInitializerError("Error al inicializar ConexionBD: " + e.getMessage());
         }
     }
 
-    public static Connection obtenerConexion() throws SQLException {
+    public static Connection obtenerConexion() throws SQLException
+    {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 
-    public static void main(String[] args) {
-        try (Connection con = obtenerConexion()) {
-            if (con != null && !con.isClosed()) {
+    public static void main(String[] args)
+    {
+        try (Connection con = obtenerConexion())
+        {
+            if (con != null && !con.isClosed())
+            {
                 System.out.println("conexion lista " + DATABASE + "!");
             }
-        } catch (SQLException e) {
+        } catch (SQLException e)
+        {
             System.err.println("Falló la conexión a PostgreSQL: " + e.getMessage());
             e.printStackTrace();
         }
