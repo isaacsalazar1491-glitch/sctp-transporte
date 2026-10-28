@@ -24,3 +24,11 @@ dist/
 
 # Word temp
 ~$*
+
+# Ignorar credenciales de base de datos
+/src/main/resources/db.properties
+.idea/dataSources*
+
+# Archivos basura de macOS en discos externos
+._*
+.DS_Store

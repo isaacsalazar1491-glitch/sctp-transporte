@@ -1,0 +1,1 @@
+* FROM prueba_rapida;
