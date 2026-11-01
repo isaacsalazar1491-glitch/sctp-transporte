@@ -35,6 +35,14 @@
             <version>42.7.2</version>
         </dependency>
 
+        <!-- Pruebas de integración (BD *_test) -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.2</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Hashing de contraseñas con BCrypt -->
         <dependency>
             <groupId>org.mindrot</groupId>
@@ -53,6 +61,20 @@
                 <configuration>
                     <source>21</source>
                     <target>21</target>
+                </configuration>
+            </plugin>
+
+            <!-- Pruebas: *IT y *Test; hora fija para las consultas públicas -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <argLine>-Dsctp.ahora=2026-10-26T07:06</argLine>
+                    <includes>
+                        <include>**/*IT.java</include>
+                        <include>**/*Test.java</include>
+                    </includes>
                 </configuration>
             </plugin>
 

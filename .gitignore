@@ -26,7 +26,10 @@ dist/
 ~$*
 
 # Ignorar credenciales de base de datos
+db.properties
+**/db.properties
 /src/main/resources/db.properties
+/src/test/resources/db.properties
 .idea/dataSources*
 
 # Archivos basura de macOS en discos externos
