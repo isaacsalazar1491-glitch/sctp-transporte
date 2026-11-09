@@ -1,0 +1,14 @@
+<resources>
+    <color name="primary">#0d3b35</color>
+    <color name="primary_dark">#082420</color>
+    <color name="accent">#2563eb</color>
+    <color name="accent_light">#eff6ff</color>
+    <color name="background">#f8fafc</color>
+    <color name="card_bg">#ffffff</color>
+    <color name="text_main">#0f172a</color>
+    <color name="text_muted">#64748b</color>
+    <color name="success">#16a34a</color>
+    <color name="warning">#d97706</color>
+    <color name="danger">#dc2626</color>
+    <color name="border">#e2e8f0</color>
+</resources>

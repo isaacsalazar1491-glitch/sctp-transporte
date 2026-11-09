@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">SCTP Transporte</string>
+    <string name="titulo_bienvenida">SCTP Móvil</string>
+    <string name="subtitulo_bienvenida">Sistema de Control de Transporte Público</string>
+    <string name="buscar_ruta_hint">Buscar ruta, parada o destino...</string>
+    <string name="btn_rutas">Ver Rutas</string>
+    <string name="btn_paradas">Paradas y Horarios</string>
+    <string name="btn_incidencias">Incidencias y Alertas</string>
+    <string name="parada_cercana_titulo">Parada cercana detectada</string>
+    <string name="parada_cercana_desc">Av. Buenavista Y Calz. del Panteón • Ruta OLIVO</string>
+    <string name="proximo_autobus">Próxima salida: 6:10 a.m.</string>
+</resources>
