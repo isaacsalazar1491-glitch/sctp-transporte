@@ -1,0 +1,5 @@
+db.host=100.127.110.88
+db.port=5433
+db.name=backend_ruta
+db.user=uni
+db.password=P4ssw0rd123106

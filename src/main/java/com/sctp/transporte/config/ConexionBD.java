@@ -9,6 +9,12 @@ import java.util.Properties;
 
 public class ConexionBD
 {
+    // parametros por defecto al servidor remoto de postgresql
+    private static final String DEFAULT_HOST = "100.127.110.88";
+    private static final String DEFAULT_PORT = "5433";
+    private static final String DEFAULT_NAME = "backend_ruta";
+    private static final String DEFAULT_USER = "uni";
+    private static final String DEFAULT_PASS = "P4ssw0rd123106";
 
     private static final Properties props = new Properties();
     private static final String URL;
@@ -18,21 +24,29 @@ public class ConexionBD
 
     static
     {
-        try (InputStream input = ConexionBD.class.getClassLoader().getResourceAsStream("db.properties")) {
-            if (input == null)
+        try
+        {
+            // intentar leer configuracion desde db.properties
+            InputStream input = ConexionBD.class.getClassLoader().getResourceAsStream("db.properties");
+            if (input != null)
             {
-                throw new RuntimeException("No se encontró el archivo db.properties en src/main/resources");
+                try (input)
+                {
+                    props.load(input);
+                }
             }
-            props.load(input);
-            String host = props.getProperty("db.host");
-            String port = props.getProperty("db.port");
-            DATABASE = props.getProperty("db.name");
-            USER = props.getProperty("db.user");
-            PASSWORD = props.getProperty("db.password");
+
+            // usar valores del archivo o respaldo directo al servidor remoto
+            String host = props.getProperty("db.host", DEFAULT_HOST);
+            String port = props.getProperty("db.port", DEFAULT_PORT);
+            DATABASE = props.getProperty("db.name", DEFAULT_NAME);
+            USER = props.getProperty("db.user", DEFAULT_USER);
+            PASSWORD = props.getProperty("db.password", DEFAULT_PASS);
             URL = "jdbc:postgresql://" + host + ":" + port + "/" + DATABASE;
 
             Class.forName("org.postgresql.Driver");
-        } catch (IOException | ClassNotFoundException e)
+        }
+        catch (IOException | ClassNotFoundException e)
         {
             throw new ExceptionInInitializerError("Error al inicializar ConexionBD: " + e.getMessage());
         }
@@ -49,11 +63,12 @@ public class ConexionBD
         {
             if (con != null && !con.isClosed())
             {
-                System.out.println("conexion lista " + DATABASE + "!");
+                System.out.println("conexion lista " + DATABASE + " en servidor remoto!");
             }
-        } catch (SQLException e)
+        }
+        catch (SQLException e)
         {
-            System.err.println("Falló la conexión a PostgreSQL: " + e.getMessage());
+            System.err.println("Fallo la conexion a PostgreSQL en el servidor: " + e.getMessage());
             e.printStackTrace();
         }
     }
