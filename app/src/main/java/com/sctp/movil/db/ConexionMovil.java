@@ -6,6 +6,7 @@ import android.os.Looper;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -17,7 +18,8 @@ public class ConexionMovil
     private static final String DB = "backend_ruta";
     private static final String USER = "uni";
     private static final String PASS = "P4ssw0rd123106";
-    private static final String URL = "jdbc:postgresql://" + HOST + ":" + PORT + "/" + DB;
+    // maxResultBuffer evita que postgresql busque java.lang.management en android
+    private static final String URL = "jdbc:postgresql://" + HOST + ":" + PORT + "/" + DB + "?maxResultBuffer=100M&ssl=false";
 
     private static final ExecutorService executor = Executors.newFixedThreadPool(4);
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -31,10 +33,16 @@ public class ConexionMovil
     public static Connection obtenerConexionDirecta() throws SQLException, ClassNotFoundException
     {
         Class.forName("org.postgresql.Driver");
-        return DriverManager.getConnection(URL, USER, PASS);
+        Properties info = new Properties();
+        info.setProperty("user", USER);
+        info.setProperty("password", PASS);
+        info.setProperty("maxResultBuffer", "100M");
+        info.setProperty("ssl", "false");
+        info.setProperty("loginTimeout", "6");
+        return DriverManager.getConnection(URL, info);
     }
 
-    // ejecucion asincrona para no bloquear el hilo principal de android
+    // ejecucion asincrona tolerante a fallos para no cerrar la app
     public static <T> void ejecutar(Operacion<T> op, Callback<T> callback)
     {
         executor.execute(() ->
@@ -44,9 +52,10 @@ public class ConexionMovil
                 T res = op.ejecutar();
                 mainHandler.post(() -> callback.onSuccess(res));
             }
-            catch (Exception e)
+            catch (Throwable t)
             {
-                mainHandler.post(() -> callback.onError(e));
+                Exception ex = (t instanceof Exception) ? (Exception) t : new Exception(t.getMessage());
+                mainHandler.post(() -> callback.onError(ex));
             }
         });
     }
