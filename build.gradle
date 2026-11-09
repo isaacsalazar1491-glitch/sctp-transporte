@@ -3,3 +3,6 @@ plugins {
     id 'com.android.application' version '8.4.1' apply false
 }
 
+layout.buildDirectory.set(file("/tmp/sctp_android_build/root"))
+
+

@@ -3,9 +3,16 @@ plugins {
     id 'com.android.application'
 }
 
+// compilar en disco interno para evitar archivos fantasma de macos en disco externo
+layout.buildDirectory.set(file("/tmp/sctp_android_build/app"))
+
 android {
     namespace 'com.sctp.movil'
     compileSdk 34
+
+    aaptOptions {
+        ignoreAssetsPattern "!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~:!._*"
+    }
 
     defaultConfig {
         applicationId "com.sctp.movil"
