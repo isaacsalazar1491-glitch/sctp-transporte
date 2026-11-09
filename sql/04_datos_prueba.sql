@@ -6,9 +6,11 @@ INSERT INTO ruta (clave, nombre, origen, destino, estado) VALUES
  ('R-02','Tianguistenco – Santiago Tilapa','Terminal Tianguistenco','Santiago Tilapa','ACTIVA'),
  ('R-03','Ruta de prueba inactiva','Origen','Destino','INACTIVA');
 
-INSERT INTO parada (id_ruta, nombre, orden, minutos_desde_origen) VALUES
- (1,'Terminal Tianguistenco',1,0),(1,'Santiago Tilapa',2,12),(1,'Lerma',3,28),(1,'Terminal Toluca',4,45),
- (2,'Terminal Tianguistenco',1,0),(2,'Mercado',2,8),(2,'Santiago Tilapa',3,15);
+INSERT INTO parada (id_ruta, nombre, orden, minutos_desde_origen, latitud, longitud) VALUES
+ (1,'Terminal Tianguistenco',1,0,19.1789,-99.4663),(1,'Santiago Tilapa',2,12,19.2257,-99.4846),
+ (1,'Lerma',3,28,19.2847,-99.5122),(1,'Terminal Toluca',4,45,19.2900,-99.6560),
+ (2,'Terminal Tianguistenco',1,0,19.1789,-99.4663),(2,'Mercado',2,8,19.1830,-99.4700),
+ (2,'Santiago Tilapa',3,15,19.2257,-99.4846);
 
 -- numero_economico se muestra como "Eco. 14"
 INSERT INTO unidad (placa, numero_economico, capacidad, estado) VALUES

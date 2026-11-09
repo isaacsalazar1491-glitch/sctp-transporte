@@ -1,6 +1,6 @@
 # SCTP · Sistema de Control de Transporte Público
 
-Java 21 · JavaFX · PostgreSQL · JDBC · BCrypt. Capas: `controller` (JavaFX) → `service` → `dao` → PostgreSQL.
+Java 21 · JavaFX · PostgreSQL · JDBC · BCrypt · Leaflet + OpenStreetMap (mapa gratuito, sin API key). Capas: `controller` (JavaFX) → `service` → `dao` → PostgreSQL.
 
 ## Base de datos
 ```
@@ -30,3 +30,27 @@ Los errores de reglas de negocio (trigger, unicidad, checks) llegan como `ReglaN
 ## Pruebas
 Requieren una BD llamada `*_test` (las pruebas recrean el esquema; si no, se omiten). Copia `src/test/resources/db.properties.example` como `db.properties` y ejecuta `mvn test`.
 Las consultas públicas usan hora fija (`-Dsctp.ahora=2026-10-26T07:06`); para una demo, usa esa misma opción en la JVM.
+
+## Frontend (JavaFX) · rama `feature/frontend`
+Pantallas basadas en los mockups `SCTP · Pantallas del frontend`.
+
+| Pantalla | FXML / controlador | Servicio |
+|---|---|---|
+| Consulta pública (mapa, llegadas, disponibilidad, avisos) | `consulta_publica` / `ConsultaPublicaController` | `ConsultaPublicaService` |
+| Acceso administrador | `login` / `LoginController` | `AuthService` |
+| Estructura de administración (navegación) | `main` / `MainController` | — |
+| Resumen de operación | `admin_dashboard` / `AdminDashboardController` | `AdministracionService` |
+| Rutas y paradas (mapa para colocar paradas) | `rutas` / `RutasController` | `AdministracionService` |
+| Unidades · Conductores · Corridas · Incidencias | `unidades`, `conductores`, `corridas`, `incidencias` | `AdministracionService` |
+
+Código de apoyo en `ui/`: `Navegador` (cambio de vistas), `Sesion`, `Tareas` (la BD se consulta fuera del hilo de JavaFX), `Fmt` (formato y chips de color) y `MapaParadas` (mapa en un WebView). Estilos en `css/styles.css`.
+
+**Ejecutar:** crea la BD (arriba), copia `db.properties` y corre `mvn javafx:run`. Para una demo con la hora de las pruebas agrega `-Dsctp.ahora=2026-10-26T07:06` a la JVM. Entra con `admin` / `admin123` desde "Acceso administrador".
+
+### Mapa de paradas (OpenStreetMap, gratuito)
+- Usa **Leaflet + teselas de OpenStreetMap** dentro de un `WebView` (`ui/MapaParadas`): sin API key ni cuenta. Requiere Internet (se carga Leaflet desde cdnjs y los mosaicos desde tile.openstreetmap.org). Muestra **solo las paradas** (puntos donde el camión sube/baja gente), sin trazar rutas.
+- Pantalla **Rutas**: clic en el mapa = coloca una parada nueva; arrastrar un marcador = guarda su nueva ubicación; buscador de lugares con Nominatim (OSM).
+- Consulta pública: el mapa muestra las paradas de la ruta; tocar un marcador elige esa parada.
+- Opcional: `maps.properties` (ver `.example`) para el centro y zoom iniciales.
+- Sin Internet el mapa muestra un aviso y en Rutas las coordenadas se pueden capturar a mano.
+- Base de datos: `parada` ahora tiene `latitud` y `longitud` (opcionales). Si ya tienes la BD creada ejecuta `sql/05_coordenadas_paradas.sql`; si la recreas, `01` y `04` ya las incluyen.

@@ -1,1 +1,142 @@
-/* Estilos generales JavaFX */
+/* SCTP · estilos JavaFX (basados en los mockups "Pantallas del frontend") */
+.root {
+    -sctp-azul: #1B64B5;
+    -sctp-azul-oscuro: #0F4A8A;
+    -sctp-amarillo: #FBE300;
+    -sctp-tinta: #0F1F33;
+    -sctp-fondo: #F0F4FC;
+    -sctp-borde: #E1E8F3;
+    -sctp-borde-campo: #C5D0E0;
+    -sctp-suave: #4A5B73;
+    -sctp-etiqueta: #3E4F66;
+    -fx-font-family: "Manrope", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-text-fill: -sctp-tinta;
+    -fx-background-color: -sctp-fondo;
+    -fx-focus-color: -sctp-azul;
+    -fx-faint-focus-color: transparent;
+}
+
+.label { -fx-text-fill: -sctp-tinta; }
+.muted { -fx-text-fill: -sctp-suave; -fx-font-size: 13px; }
+.muted-small { -fx-text-fill: -sctp-suave; -fx-font-size: 12px; }
+.field-label { -fx-text-fill: -sctp-etiqueta; -fx-font-size: 13px; -fx-font-weight: 600; }
+.page-title { -fx-font-size: 32px; -fx-font-weight: 800; }
+.h2 { -fx-font-size: 20px; -fx-font-weight: 800; }
+.h3 { -fx-font-size: 18px; -fx-font-weight: 800; }
+.scroll-pane, .scroll-pane > .viewport { -fx-background-color: transparent; -fx-background: -sctp-fondo; }
+.scroll-pane { -fx-padding: 0; }
+
+/* ---------- Encabezados ---------- */
+.header-bar { -fx-background-color: -sctp-azul; -fx-padding: 16 40 16 40; -fx-spacing: 16; }
+.hero { -fx-background-color: -sctp-azul; -fx-padding: 20 40 110 40; -fx-spacing: 28; }
+.brand-logo { -fx-background-color: -sctp-amarillo; -fx-background-radius: 10; -fx-min-width: 36; -fx-min-height: 36; -fx-pref-width: 36; -fx-pref-height: 36; }
+.brand-text { -fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: 800; }
+.hero-kicker { -fx-text-fill: -sctp-amarillo; -fx-font-size: 12px; -fx-font-weight: 800; }
+.hero-title { -fx-text-fill: white; -fx-font-size: 44px; -fx-font-weight: 800; }
+
+.nav-link { -fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: 600; -fx-cursor: hand; -fx-padding: 8 4 8 4; }
+.nav-link:hover { -fx-text-fill: -sctp-amarillo; }
+.nav-link-active { -fx-font-weight: 800; -fx-underline: true; }
+
+/* ---------- Botones ---------- */
+.btn-accent, .btn-primary, .btn-outline, .btn-danger {
+    -fx-background-radius: 12; -fx-border-radius: 12; -fx-font-weight: 700; -fx-font-size: 15px;
+    -fx-cursor: hand; -fx-padding: 0 22 0 22; -fx-min-height: 44;
+}
+.btn-accent { -fx-background-color: -sctp-amarillo; -fx-text-fill: -sctp-tinta; }
+.btn-accent:hover { -fx-background-color: #FFEE33; }
+.btn-primary { -fx-background-color: -sctp-azul; -fx-text-fill: white; }
+.btn-primary:hover { -fx-background-color: -sctp-azul-oscuro; }
+.btn-outline { -fx-background-color: white; -fx-border-color: -sctp-azul; -fx-text-fill: -sctp-azul; }
+.btn-outline:hover { -fx-background-color: #EEF4FC; }
+.btn-danger { -fx-background-color: white; -fx-border-color: #8A1A12; -fx-text-fill: #8A1A12; }
+.btn-danger:hover { -fx-background-color: #FBEAE8; }
+.btn-accent:disabled, .btn-primary:disabled, .btn-outline:disabled, .btn-danger:disabled { -fx-opacity: 0.45; }
+.btn-icon { -fx-background-color: transparent; -fx-background-radius: 10; -fx-min-width: 44; -fx-min-height: 44; -fx-cursor: hand; }
+.btn-icon:hover { -fx-background-color: #E6EEFA; }
+.btn-filter { -fx-background-color: white; -fx-border-color: -sctp-borde-campo; -fx-border-radius: 999; -fx-background-radius: 999; -fx-font-weight: 700; -fx-padding: 8 16 8 16; -fx-cursor: hand; }
+.btn-filter:selected { -fx-background-color: -sctp-azul; -fx-border-color: -sctp-azul; -fx-text-fill: white; }
+.btn-dia { -fx-background-color: white; -fx-border-color: -sctp-borde-campo; -fx-border-radius: 10; -fx-background-radius: 10; -fx-font-weight: 800; -fx-min-width: 44; -fx-min-height: 40; -fx-cursor: hand; }
+.btn-dia:selected { -fx-background-color: -sctp-azul; -fx-border-color: -sctp-azul; -fx-text-fill: white; }
+
+/* ---------- Campos ---------- */
+.text-field, .password-field, .text-area, .combo-box, .date-picker > .text-field {
+    -fx-background-color: white; -fx-border-color: -sctp-borde-campo; -fx-border-radius: 12; -fx-background-radius: 12;
+    -fx-font-size: 15px; -fx-text-fill: -sctp-tinta;
+}
+.text-field, .password-field { -fx-padding: 0 14 0 14; -fx-min-height: 46; -fx-pref-height: 46; }
+.text-field:focused, .password-field:focused, .text-area:focused, .combo-box:focused { -fx-border-color: -sctp-azul; }
+.text-field:readonly { -fx-background-color: -sctp-fondo; -fx-border-color: -sctp-borde; -fx-text-fill: -sctp-etiqueta; }
+.text-area { -fx-padding: 0; }
+.text-area .content { -fx-background-color: white; -fx-background-radius: 12; -fx-padding: 8 10 8 10; }
+.combo-box { -fx-min-height: 46; -fx-pref-height: 46; }
+.combo-box .list-cell { -fx-padding: 0 8 0 8; -fx-font-size: 15px; -fx-font-weight: 600; }
+.combo-box-base > .arrow-button { -fx-background-color: transparent; }
+.date-picker { -fx-min-height: 46; }
+.date-picker > .arrow-button { -fx-background-color: transparent; }
+.text-field.login { -fx-min-height: 52; -fx-pref-height: 52; -fx-font-size: 16px; }
+
+/* ---------- Tarjetas ---------- */
+.card { -fx-background-color: white; -fx-border-color: -sctp-borde; -fx-border-radius: 18; -fx-background-radius: 18; }
+.card-pad { -fx-padding: 22 24 22 24; -fx-spacing: 14; }
+.search-card { -fx-background-color: white; -fx-background-radius: 18; -fx-padding: 22 24 22 24; -fx-spacing: 20; -fx-effect: dropshadow(gaussian, rgba(15,31,51,0.10), 24, 0, 0, 6); }
+.login-aside { -fx-background-color: -sctp-azul; -fx-padding: 48 64 48 64; }
+.login-title { -fx-text-fill: white; -fx-font-size: 46px; -fx-font-weight: 800; }
+.login-subtitle { -fx-text-fill: white; -fx-font-size: 18px; }
+.login-card { -fx-background-color: white; -fx-border-color: -sctp-borde; -fx-border-radius: 22; -fx-background-radius: 22; -fx-padding: 40; -fx-spacing: 20; }
+.login-heading { -fx-font-size: 30px; -fx-font-weight: 800; }
+.link { -fx-background-color: transparent; -fx-text-fill: -sctp-azul; -fx-font-weight: 600; -fx-cursor: hand; }
+.link:hover { -fx-text-fill: -sctp-azul-oscuro; -fx-underline: true; }
+
+/* ---------- Chips y avisos ---------- */
+.chip { -fx-font-size: 12px; -fx-font-weight: 800; -fx-background-radius: 999; -fx-padding: 4 10 4 10; }
+.chip-ok { -fx-background-color: #D7F2E1; -fx-text-fill: #0E5A31; }
+.chip-warn { -fx-background-color: #FDE9BE; -fx-text-fill: #6B4300; }
+.chip-danger { -fx-background-color: #F8D4D0; -fx-text-fill: #8A1A12; }
+.chip-info { -fx-background-color: #DCE9F8; -fx-text-fill: -sctp-azul-oscuro; }
+.chip-neutral { -fx-background-color: #EEF2FA; -fx-text-fill: -sctp-etiqueta; }
+.chip-estimacion { -fx-background-color: #FDE9BE; -fx-text-fill: #6B4300; -fx-font-size: 12px; -fx-font-weight: 800; -fx-background-radius: 999; -fx-padding: 6 12 6 12; }
+.alert-error { -fx-background-color: #F8D4D0; -fx-text-fill: #8A1A12; -fx-background-radius: 12; -fx-padding: 14 16 14 16; -fx-font-weight: 600; -fx-font-size: 15px; -fx-wrap-text: true; }
+.alert-ok { -fx-background-color: #D7F2E1; -fx-text-fill: #0E5A31; -fx-background-radius: 12; -fx-padding: 14 16 14 16; -fx-font-weight: 600; -fx-font-size: 15px; -fx-wrap-text: true; }
+
+/* ---------- Tablas ---------- */
+.table-view { -fx-background-color: transparent; -fx-background-insets: 0; -fx-padding: 0; -fx-table-cell-border-color: transparent; }
+.table-view .column-header-background { -fx-background-color: transparent; }
+.table-view .column-header, .table-view .filler { -fx-background-color: transparent; -fx-border-color: transparent transparent -sctp-borde transparent; -fx-border-width: 0 0 2 0; -fx-size: 40; }
+.table-view .column-header .label { -fx-text-fill: -sctp-etiqueta; -fx-font-size: 11px; -fx-font-weight: 700; -fx-alignment: CENTER-LEFT; }
+.table-row-cell { -fx-background-color: transparent; -fx-border-color: transparent transparent #EEF2FA transparent; -fx-cell-size: 48; }
+.table-row-cell:selected { -fx-background-color: #E6EEFA; }
+.table-row-cell:selected .text { -fx-fill: -sctp-tinta; }
+.table-cell { -fx-alignment: CENTER-LEFT; -fx-padding: 0 6 0 6; -fx-text-fill: -sctp-tinta; }
+.table-view .placeholder .label { -fx-text-fill: -sctp-suave; }
+.llegada-hora { -fx-font-size: 17px; -fx-font-weight: 800; }
+
+/* ---------- Tarjetas de resumen ---------- */
+.stat-card { -fx-background-color: white; -fx-border-color: -sctp-borde; -fx-border-radius: 18; -fx-background-radius: 18; -fx-padding: 20 24 20 24; -fx-spacing: 6; }
+.stat-number { -fx-font-size: 40px; -fx-font-weight: 800; }
+.unidad-card { -fx-background-color: -sctp-fondo; -fx-background-radius: 12; -fx-padding: 14; -fx-spacing: 4; }
+.unidad-nombre { -fx-font-size: 15px; -fx-font-weight: 800; }
+.aviso-item { -fx-background-color: -sctp-fondo; -fx-background-radius: 12; -fx-padding: 12 14 12 14; -fx-spacing: 12; -fx-alignment: CENTER_LEFT; }
+.regla-fila { -fx-spacing: 12; -fx-alignment: TOP_LEFT; }
+.regla-clave { -fx-font-weight: 800; -fx-min-width: 90; }
+
+/* ---------- Paradas ---------- */
+.parada-item { -fx-background-color: -sctp-fondo; -fx-background-radius: 12; -fx-padding: 8 10 8 10; -fx-spacing: 12; -fx-alignment: CENTER_LEFT; -fx-cursor: hand; }
+.parada-item-activa { -fx-background-color: #FFF6B8; -fx-border-color: #E8D400; -fx-border-radius: 12; }
+.parada-badge { -fx-background-color: -sctp-azul; -fx-background-radius: 999; -fx-min-width: 28; -fx-min-height: 28; -fx-alignment: CENTER; }
+.parada-badge .label { -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 800; }
+.parada-item-activa .parada-badge { -fx-background-color: -sctp-amarillo; }
+.parada-item-activa .parada-badge .label { -fx-text-fill: -sctp-tinta; }
+.parada-nombre { -fx-font-size: 14px; -fx-font-weight: 700; }
+
+/* ---------- Mapa ---------- */
+.mapa { -fx-background-color: #E4EAF4; }
+.mapa-aviso { -fx-background-color: white; -fx-background-radius: 14; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(15,31,51,0.15), 12, 0, 0, 2); }
+.mapa-aviso-titulo { -fx-font-size: 16px; -fx-font-weight: 800; }
+.mapa-aviso-texto { -fx-text-fill: -sctp-suave; -fx-font-size: 13px; -fx-wrap-text: true; }
+.mapa-modo { -fx-background-color: -sctp-amarillo; -fx-background-radius: 999; -fx-padding: 8 14 8 14; -fx-font-size: 13px; -fx-font-weight: 700; }
+
+/* ---------- Diálogos ---------- */
+.dialog-pane { -fx-background-color: white; }
+.dialog-pane > .content.label { -fx-padding: 8 0 8 0; }

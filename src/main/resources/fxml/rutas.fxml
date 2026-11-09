@@ -1,1 +1,94 @@
-<!-- Vista de gestion de rutas -->
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.sctp.transporte.ui.MapaParadas?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Rutas y paradas (mapa para colocar paradas) -->
+<ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fitToWidth="true" hbarPolicy="NEVER"
+            fx:controller="com.sctp.transporte.controller.RutasController">
+    <VBox spacing="24">
+        <padding><Insets top="32" right="40" bottom="40" left="40"/></padding>
+        <HBox alignment="CENTER_LEFT">
+            <Label text="Rutas y paradas" styleClass="page-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="+ Nueva ruta" styleClass="btn-accent" onAction="#nuevaRuta"/>
+        </HBox>
+        <Label fx:id="mensaje" maxWidth="Infinity"/>
+
+        <HBox spacing="24" alignment="TOP_LEFT">
+            <!-- Mapa para colocar paradas -->
+            <VBox styleClass="card" HBox.hgrow="ALWAYS" prefWidth="700" minWidth="460">
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <padding><Insets top="18" right="24" bottom="18" left="24"/></padding>
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <HBox spacing="8" alignment="CENTER_LEFT">
+                            <ComboBox fx:id="comboRuta" prefWidth="280" minWidth="200" promptText="Elige una ruta"/>
+                            <Button fx:id="btnEditarRuta" text="Editar" minWidth="-Infinity" styleClass="link" onAction="#editarRuta"/>
+                            <Button fx:id="btnBajaRuta" text="Dar de baja" minWidth="-Infinity" styleClass="link" onAction="#darDeBajaRuta"/>
+                        </HBox>
+                        <Label fx:id="ayuda" text="Haz clic en el mapa para colocar una parada nueva. Arrastra un marcador para moverlo."
+                               styleClass="muted" wrapText="true"/>
+                    </VBox>
+                    <TextField fx:id="buscar" promptText="Buscar lugar o dirección" prefWidth="250" onAction="#buscarLugar"/>
+                </HBox>
+                <StackPane prefHeight="560" minHeight="560" maxHeight="560">
+                    <MapaParadas fx:id="mapa"/>
+                    <Label fx:id="modo" text="Modo colocar parada" styleClass="mapa-modo" StackPane.alignment="TOP_LEFT"
+                           mouseTransparent="true">
+                        <StackPane.margin><Insets top="14" left="14"/></StackPane.margin>
+                    </Label>
+                </StackPane>
+            </VBox>
+
+            <!-- Panel derecho -->
+            <VBox spacing="24" prefWidth="400" minWidth="340" HBox.hgrow="SOMETIMES">
+                <VBox styleClass="card, card-pad" spacing="12">
+                    <Label text="Paradas de la ruta" styleClass="h3"/>
+                    <VBox fx:id="listaParadas" spacing="8"/>
+                </VBox>
+
+                <VBox styleClass="card, card-pad">
+                    <Label fx:id="tituloForm" text="Parada nueva" styleClass="h3"/>
+                    <VBox spacing="6">
+                        <Label text="Nombre" styleClass="field-label"/>
+                        <TextField fx:id="nombre" promptText="Nombre de la parada"/>
+                    </VBox>
+                    <HBox spacing="12">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Orden" styleClass="field-label"/>
+                            <TextField fx:id="orden"/>
+                        </VBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Minutos desde el origen" styleClass="field-label"/>
+                            <TextField fx:id="minutos" promptText="Minutos"/>
+                        </VBox>
+                    </HBox>
+                    <HBox spacing="12">
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Latitud" styleClass="field-label"/>
+                            <TextField fx:id="latitud" editable="false" promptText="Haz clic en el mapa"/>
+                        </VBox>
+                        <VBox spacing="6" HBox.hgrow="ALWAYS">
+                            <Label text="Longitud" styleClass="field-label"/>
+                            <TextField fx:id="longitud" editable="false" promptText="Haz clic en el mapa"/>
+                        </VBox>
+                    </HBox>
+                    <Label fx:id="notaCoordenadas" text="Latitud y longitud se llenan al hacer clic en el mapa." styleClass="muted-small" wrapText="true"/>
+                    <HBox spacing="12">
+                        <Button fx:id="guardar" text="Guardar parada" styleClass="btn-accent" onAction="#guardarParada"/>
+                        <Button text="Cancelar" styleClass="btn-outline" onAction="#cancelar"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </HBox>
+    </VBox>
+</ScrollPane>

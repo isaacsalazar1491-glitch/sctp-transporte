@@ -1,1 +1,55 @@
-<!-- Dialogo / Vista de login -->
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Acceso administrador -->
+<HBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.sctp.transporte.controller.LoginController">
+    <VBox styleClass="login-aside" spacing="40" prefWidth="520" minWidth="360" HBox.hgrow="ALWAYS">
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Region styleClass="brand-logo"/>
+            <Label text="SCTP" styleClass="brand-text" style="-fx-font-size: 22px;"/>
+        </HBox>
+        <Region VBox.vgrow="ALWAYS"/>
+        <VBox spacing="16">
+            <Label text="Mantén tu operación en un solo lugar." styleClass="login-title" wrapText="true"/>
+            <Label text="Rutas, unidades, conductores y horarios, siempre al día." styleClass="login-subtitle" wrapText="true"/>
+        </VBox>
+        <Region VBox.vgrow="ALWAYS"/>
+        <HBox spacing="10">
+            <Region style="-fx-background-color: #FBE300; -fx-background-radius: 3;" prefWidth="50" prefHeight="6" minHeight="6" maxHeight="6"/>
+            <Region style="-fx-background-color: #8DB6E6; -fx-background-radius: 3;" prefWidth="50" prefHeight="6" minHeight="6" maxHeight="6"/>
+            <Region style="-fx-background-color: #8DB6E6; -fx-background-radius: 3;" prefWidth="50" prefHeight="6" minHeight="6" maxHeight="6"/>
+        </HBox>
+    </VBox>
+
+    <StackPane prefWidth="620" minWidth="420" HBox.hgrow="ALWAYS" style="-fx-background-color: #F0F4FC;">
+        <padding><Insets top="48" right="32" bottom="48" left="32"/></padding>
+        <VBox styleClass="login-card" maxWidth="460" maxHeight="-Infinity">
+            <VBox spacing="6">
+                <Label text="Acceso administrador" styleClass="login-heading"/>
+                <Label text="Solo personal autorizado de la organización." styleClass="muted"/>
+            </VBox>
+            <VBox spacing="6">
+                <Label text="Usuario" styleClass="field-label"/>
+                <TextField fx:id="usuario" styleClass="login" onAction="#iniciarSesion"/>
+            </VBox>
+            <VBox spacing="6">
+                <Label text="Contraseña" styleClass="field-label"/>
+                <PasswordField fx:id="clave" styleClass="login" onAction="#iniciarSesion"/>
+            </VBox>
+            <Label fx:id="error" maxWidth="Infinity"/>
+            <Button fx:id="entrar" text="Iniciar sesión" onAction="#iniciarSesion" styleClass="btn-primary"
+                    maxWidth="Infinity" prefHeight="52" defaultButton="true"/>
+            <Button text="← Volver a la consulta pública" onAction="#volver" styleClass="link" alignment="CENTER"/>
+        </VBox>
+    </StackPane>
+</HBox>
