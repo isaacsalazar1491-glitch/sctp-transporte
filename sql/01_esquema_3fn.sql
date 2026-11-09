@@ -28,6 +28,9 @@ CREATE TABLE parada (
     nombre               VARCHAR(100) NOT NULL,
     orden                INT          NOT NULL CHECK (orden > 0),
     minutos_desde_origen INT          NOT NULL CHECK (minutos_desde_origen >= 0),
+    -- Ubicación (Google Maps); NULL = parada aún sin colocar en el mapa
+    latitud              NUMERIC(9,6) NULL CHECK (latitud  BETWEEN -90  AND 90),
+    longitud             NUMERIC(9,6) NULL CHECK (longitud BETWEEN -180 AND 180),
     UNIQUE (id_ruta, orden)
 );
 

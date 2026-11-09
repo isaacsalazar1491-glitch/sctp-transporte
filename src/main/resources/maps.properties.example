@@ -1,0 +1,5 @@
+# Opcional: copia como maps.properties (ignorado por git) para cambiar el centro inicial del mapa.
+# El mapa usa OpenStreetMap + Leaflet: gratuito y NO requiere clave de API.
+maps.centro.lat=19.1789
+maps.centro.lng=-99.4663
+maps.zoom=12

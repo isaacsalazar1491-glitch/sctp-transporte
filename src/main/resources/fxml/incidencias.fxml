@@ -1,1 +1,85 @@
-<!-- Vista de gestion de incidencias -->
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Incidencias -->
+<ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fitToWidth="true" hbarPolicy="NEVER"
+            fx:controller="com.sctp.transporte.controller.IncidenciasController">
+    <VBox spacing="24">
+        <padding><Insets top="32" right="40" bottom="40" left="40"/></padding>
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="Incidencias" styleClass="page-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <HBox fx:id="filtros" spacing="8">
+                <ToggleButton text="Todas" userData="TODAS" styleClass="btn-filter" selected="true"/>
+                <ToggleButton text="Abiertas" userData="ABIERTA" styleClass="btn-filter"/>
+                <ToggleButton text="En atención" userData="EN_ATENCION" styleClass="btn-filter"/>
+                <ToggleButton text="Cerradas" userData="CERRADA" styleClass="btn-filter"/>
+            </HBox>
+        </HBox>
+
+        <HBox spacing="24" alignment="TOP_LEFT">
+            <VBox styleClass="card, card-pad" HBox.hgrow="ALWAYS" prefWidth="660" minWidth="440">
+                <TableView fx:id="tabla">
+                    <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+                    <columns>
+                        <TableColumn fx:id="colRuta" text="RUTA" sortable="false" maxWidth="90"/>
+                        <TableColumn fx:id="colUnidad" text="UNIDAD" sortable="false" maxWidth="100"/>
+                        <TableColumn fx:id="colDescripcion" text="DESCRIPCIÓN" sortable="false" prefWidth="260"/>
+                        <TableColumn fx:id="colSeveridad" text="SEVERIDAD" sortable="false"/>
+                        <TableColumn fx:id="colEstado" text="ESTADO" sortable="false"/>
+                    </columns>
+                </TableView>
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <HBox fx:id="pasoActual" spacing="8" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                        <Label fx:id="textoPaso" text="Selecciona una incidencia para cambiar su estado." styleClass="muted" wrapText="true"/>
+                    </HBox>
+                    <Button fx:id="btnAtencion" text="Pasar a en atención" styleClass="btn-outline" onAction="#pasarAAtencion" disable="true"/>
+                    <Button fx:id="btnCerrar" text="Cerrar" styleClass="btn-primary" onAction="#cerrar" disable="true"/>
+                </HBox>
+                <Label text="El estado avanza en orden (abierta, en atención, cerrada), sin saltos ni retrocesos." styleClass="muted-small" wrapText="true"/>
+            </VBox>
+
+            <VBox styleClass="card, card-pad" prefWidth="380" minWidth="320" HBox.hgrow="SOMETIMES">
+                <Label text="Registrar incidencia" styleClass="h3"/>
+                <Label fx:id="mensaje" maxWidth="Infinity"/>
+                <VBox spacing="6">
+                    <Label text="Ruta" styleClass="field-label"/>
+                    <ComboBox fx:id="comboRuta" maxWidth="Infinity" promptText="Elige una ruta"/>
+                </VBox>
+                <HBox spacing="12">
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <Label text="Unidad" styleClass="field-label"/>
+                        <ComboBox fx:id="comboUnidad" maxWidth="Infinity" promptText="Unidad"/>
+                    </VBox>
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <Label text="Severidad" styleClass="field-label"/>
+                        <ComboBox fx:id="comboSeveridad" maxWidth="Infinity"/>
+                    </VBox>
+                </HBox>
+                <VBox spacing="6">
+                    <Label text="Conductor (opcional)" styleClass="field-label"/>
+                    <ComboBox fx:id="comboConductor" maxWidth="Infinity" promptText="Sin conductor"/>
+                </VBox>
+                <VBox spacing="6">
+                    <Label text="Descripción" styleClass="field-label"/>
+                    <TextArea fx:id="descripcion" prefRowCount="3" wrapText="true" promptText="Describe la incidencia (máximo 300 caracteres)"/>
+                    <Label fx:id="contador" text="0 / 300" styleClass="muted-small"/>
+                </VBox>
+                <Label text="Una incidencia GRAVE pasa la unidad a mantenimiento. No se reactiva sola." styleClass="muted-small" wrapText="true"/>
+                <Button fx:id="registrar" text="Registrar" styleClass="btn-accent" onAction="#registrar" maxWidth="Infinity"/>
+            </VBox>
+        </HBox>
+    </VBox>
+</ScrollPane>

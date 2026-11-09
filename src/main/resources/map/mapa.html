@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<style>
+  html, body, #mapa { height: 100%; margin: 0; padding: 0; background: #E4EAF4; font-family: "Segoe UI", Arial, sans-serif; }
+  .parada { position: relative; display: flex; align-items: center; white-space: nowrap; }
+  .parada .num { box-sizing: border-box; width: 30px; height: 30px; border-radius: 50%; background: #1B64B5; color: #fff;
+    border: 3.5px solid #fff; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 4px rgba(15,31,51,.35); flex: none; }
+  .parada .nombre { margin-left: 4px; background: #fff; color: #0F1F33; border: 1px solid #C5D0E0; border-radius: 14px;
+    padding: 0 12px; height: 28px; line-height: 26px; font-weight: 700; font-size: 13px; box-shadow: 0 1px 3px rgba(15,31,51,.2); }
+  .parada.activa .num { width: 38px; height: 38px; background: #FBE300; color: #0F1F33; border-color: #0F1F33; font-size: 16px; }
+  .parada.activa .nombre { background: #0F1F33; color: #fff; border-color: #0F1F33; }
+  .temporal { width: 34px; height: 34px; box-sizing: border-box; border-radius: 50%; background: #fff; border: 3.5px dashed #1B64B5;
+    color: #1B64B5; font-weight: 800; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+  .editando { cursor: crosshair !important; }
+</style>
+</head>
+<body>
+<div id="mapa"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+/* Puente JavaFX <-> Leaflet (OpenStreetMap). Java expone `window.java` (MapaParadas.Puente) y llama a window.sctp.* */
+var mapa = null, capa = null, marcadores = {}, temporal = null, editable = false, resaltada = null, datos = [];
+var listoJava = false;
+
+function avisar(msg) { if (window.java) window.java.errorMapa(String(msg)); else window.__pendiente = String(msg); }
+function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+window.javaListo = function () {
+  listoJava = true;
+  if (typeof L === 'undefined') { avisar('No se pudo cargar el mapa (Leaflet). Revisa la conexión a Internet.'); return; }
+  iniciar();
+};
+
+function iniciar() {
+  if (mapa) return;
+  mapa = L.map('mapa', { center: [__LAT__, __LNG__], zoom: __ZOOM__, zoomControl: true });
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(mapa);
+  capa = L.layerGroup().addTo(mapa);
+  mapa.on('click', function (e) {
+    if (!editable) return;
+    ponerTemporal(e.latlng.lat, e.latlng.lng);
+    window.java.clicMapa(e.latlng.lat, e.latlng.lng);
+  });
+  window.java.mapaListo();
+}
+
+function iconoParada(p) {
+  var activa = p.id === resaltada;
+  var html = '<div class="parada' + (activa ? ' activa' : '') + '"><div class="num">' + p.orden + '</div><div class="nombre">' + esc(p.nombre) + '</div></div>';
+  return L.divIcon({ html: html, className: '', iconSize: null, iconAnchor: [activa ? 19 : 15, activa ? 19 : 15] });
+}
+
+function dibujar(ajustar) {
+  if (!mapa) return;
+  capa.clearLayers();
+  marcadores = {};
+  var pts = [];
+  datos.forEach(function (p) {
+    if (p.lat === null || p.lng === null) return;
+    var m = L.marker([p.lat, p.lng], { icon: iconoParada(p), draggable: editable, title: p.nombre, zIndexOffset: p.id === resaltada ? 1000 : 0 });
+    m.on('click', function () { window.java.seleccionar(p.id); });
+    m.on('dragend', function () { var ll = m.getLatLng(); window.java.moverParada(p.id, ll.lat, ll.lng); });
+    m.addTo(capa);
+    marcadores[p.id] = m;
+    pts.push([p.lat, p.lng]);
+  });
+  if (ajustar && pts.length) mapa.fitBounds(pts, { padding: [60, 60], maxZoom: 17 });
+}
+
+function ponerTemporal(lat, lng) {
+  if (!mapa) return;
+  if (!temporal) {
+    temporal = L.marker([lat, lng], {
+      draggable: true, zIndexOffset: 2000,
+      icon: L.divIcon({ html: '<div class="temporal">+</div>', className: '', iconSize: [34, 34], iconAnchor: [17, 17] })
+    });
+    temporal.on('dragend', function () { var ll = temporal.getLatLng(); window.java.clicMapa(ll.lat, ll.lng); });
+  }
+  temporal.setLatLng([lat, lng]);
+  if (!mapa.hasLayer(temporal)) temporal.addTo(mapa);
+}
+
+window.sctp = {
+  paradas: function (json, ajustar) { datos = JSON.parse(json); dibujar(ajustar); },
+  resaltar: function (id) { resaltada = id; dibujar(false); },
+  editable: function (v) {
+    editable = !!v; dibujar(false);
+    if (mapa) { var c = mapa.getContainer(); if (editable) c.classList.add('editando'); else c.classList.remove('editando'); }
+  },
+  temporal: function (lat, lng) {
+    if (lat === null || lng === null) { if (temporal && mapa) mapa.removeLayer(temporal); return; }
+    ponerTemporal(lat, lng);
+  },
+  /* Búsqueda con Nominatim (OpenStreetMap): solo cuando el usuario la pide. */
+  buscar: function (texto) {
+    if (!mapa) return;
+    var x = new XMLHttpRequest();
+    x.open('GET', 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=mx&accept-language=es&q=' + encodeURIComponent(texto));
+    x.onload = function () {
+      try {
+        var r = JSON.parse(x.responseText);
+        if (!r.length) { window.java.avisoBusqueda('No se encontró ese lugar.'); return; }
+        var b = r[0].boundingbox;
+        if (b) mapa.fitBounds([[+b[0], +b[2]], [+b[1], +b[3]]], { maxZoom: 17 });
+        else mapa.setView([+r[0].lat, +r[0].lon], 16);
+      } catch (e) { window.java.avisoBusqueda('No se pudo interpretar la búsqueda.'); }
+    };
+    x.onerror = function () { window.java.avisoBusqueda('No se pudo buscar el lugar. Revisa la conexión.'); };
+    x.send();
+  }
+};
+</script>
+</body>
+</html>
