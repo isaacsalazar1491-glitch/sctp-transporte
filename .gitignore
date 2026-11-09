@@ -2,6 +2,10 @@
 target/
 *.class
 
+# Android / Gradle
+.gradle/
+local.properties
+
 # macOS
 .DS_Store
 ._*

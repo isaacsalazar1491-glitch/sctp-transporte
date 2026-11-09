@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "backend_ruta"
 include ':app'
+
