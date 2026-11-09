@@ -28,6 +28,13 @@
             <version>${javafx.version}</version>
         </dependency>
 
+        <!-- JavaFX Web para mapas (WebView / WebEngine) -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
         <!-- Driver PostgreSQL JDBC -->
         <dependency>
             <groupId>org.postgresql</groupId>

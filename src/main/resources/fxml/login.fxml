@@ -1,1 +1,44 @@
-<!-- Dialogo / Vista de login -->
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" prefWidth="420.0" spacing="14.0" style="-fx-background-color: #ffffff; -fx-padding: 28;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sctp.transporte.controller.LoginController">
+    <children>
+        <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0f172a;" text="Acceso Administrador" />
+        <Label style="-fx-font-size: 13px; -fx-text-fill: #64748b;" text="Ingresa tus credenciales para gestionar el sistema" />
+        <Separator prefWidth="200.0" />
+
+        <VBox spacing="5.0">
+            <children>
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Usuario" />
+                <TextField fx:id="txtUsuario" promptText="Usuario administrador" style="-fx-padding: 10; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6;" />
+            </children>
+        </VBox>
+
+        <VBox spacing="5.0">
+            <children>
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Contraseña" />
+                <PasswordField fx:id="txtPassword" promptText="••••••••" style="-fx-padding: 10; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6;" />
+            </children>
+        </VBox>
+
+        <Label fx:id="lblMensajeError" managed="false" style="-fx-text-fill: #dc2626; -fx-font-size: 12px; -fx-font-weight: bold;" text="" visible="false" wrapText="true" />
+
+        <HBox alignment="CENTER_RIGHT" spacing="10.0">
+            <VBox.margin>
+                <Insets top="8.0" />
+            </VBox.margin>
+            <children>
+                <Button onAction="#handleCancelar" style="-fx-background-color: #f1f5f9; -fx-text-fill: #475569; -fx-padding: 9 18; -fx-background-radius: 6; -fx-cursor: hand;" text="Cancelar" />
+                <Button defaultButton="true" onAction="#handleLogin" style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 9 20; -fx-background-radius: 6; -fx-cursor: hand;" text="Entrar" />
+            </children>
+        </HBox>
+    </children>
+</VBox>

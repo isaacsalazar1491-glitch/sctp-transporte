@@ -1,1 +1,163 @@
-<!-- Vista principal contenedor -->
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.GaussianBlur?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+
+<BorderPane fx:id="rootPane" prefHeight="720.0" prefWidth="1150.0" style="-fx-background-color: #f8fafc;" stylesheets="@../css/styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sctp.transporte.controller.MainController">
+
+    <!-- Encabezado superior compacto con la abejita y textura de tejido -->
+    <top>
+        <StackPane style="-fx-background-color: #1e293b;">
+            <children>
+                <Region prefHeight="55.0" style="-fx-background-image: url('/img/tejidp.jpg'); -fx-background-size: cover; -fx-background-position: center;">
+                    <effect>
+                        <GaussianBlur radius="6.0" />
+                    </effect>
+                </Region>
+
+                <HBox alignment="CENTER_LEFT" spacing="12.0" style="-fx-background-color: rgba(15, 23, 42, 0.55); -fx-padding: 8 24;">
+                    <children>
+                        <Label style="-fx-font-size: 24px; -fx-text-fill: white; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.85), 6, 0.4, 0, 1);" text="🐝" />
+                        <VBox alignment="CENTER_LEFT" spacing="0.0">
+                            <children>
+                                <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ffffff; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.9), 6, 0.4, 0, 1);" text="¡Hola!" />
+                                <Label fx:id="lblFecha" style="-fx-font-size: 11.5px; -fx-font-weight: bold; -fx-text-fill: #f8fafc; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.9), 6, 0.4, 0, 1);" text="Cargando fecha..." />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+            </children>
+        </StackPane>
+    </top>
+
+    <!-- Área central -->
+    <center>
+        <StackPane fx:id="contenedorCentral" style="-fx-padding: 16;">
+            <children>
+                <VBox fx:id="vistaDashboardInicio" alignment="TOP_CENTER" spacing="24.0" style="-fx-padding: 10 40;">
+                    <children>
+
+                        <!-- Tarjeta AIRE Y SALUD con fondo blanco puro -->
+                        <StackPane maxWidth="540.0" style="-fx-background-color: #ffffff; -fx-background-radius: 24; -fx-border-color: #e2e8f0; -fx-border-radius: 24; -fx-border-width: 1; -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 10, 0, 0, 3);">
+                            <children>
+                                <VBox alignment="CENTER" spacing="12.0" style="-fx-padding: 14 24 18 24;">
+                                    <children>
+                                        <!-- Título y Ubicación Real Automática con Pin -->
+                                        <VBox alignment="CENTER" spacing="2.0">
+                                            <children>
+                                                <Label style="-fx-font-size: 17px; -fx-font-weight: 900; -fx-text-fill: #0b2e2b;" text="AIRE Y SALUD" />
+                                                <Label fx:id="lblUbicacion" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #0d9488;" text="📍 Detectando ubicación..." />
+                                            </children>
+                                        </VBox>
+
+                                        <!-- Los 3 indicadores circulares con barrita inferior -->
+                                        <HBox alignment="TOP_CENTER" spacing="36.0">
+                                            <children>
+
+                                                <!-- 1. Temperatura / Clima -->
+                                                <VBox alignment="TOP_CENTER" spacing="6.0" prefWidth="100.0">
+                                                    <children>
+                                                        <StackPane prefHeight="72.0" prefWidth="72.0" style="-fx-background-color: #f8fafc; -fx-background-radius: 36;">
+                                                            <children>
+                                                                <Circle fill="#f1f5f9" radius="35.0" />
+                                                                <StackPane fx:id="contIconoClima" maxHeight="40.0" maxWidth="40.0" prefHeight="40.0" prefWidth="40.0" />
+                                                            </children>
+                                                        </StackPane>
+                                                        <Label fx:id="lblTemp" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #0b2e2b;" text="--°C" />
+                                                        <Label fx:id="lblClimaDesc" style="-fx-font-size: 10px; -fx-text-fill: #64748b;" text="Cargando..." textAlignment="CENTER" wrapText="true" />
+                                                    </children>
+                                                </VBox>
+
+                                                <!-- 2. Calidad del Aire -->
+                                                <VBox alignment="TOP_CENTER" spacing="6.0" prefWidth="100.0">
+                                                    <children>
+                                                        <StackPane prefHeight="72.0" prefWidth="72.0" style="-fx-background-color: #f8fafc; -fx-background-radius: 36;">
+                                                            <children>
+                                                                <Circle fill="#f1f5f9" radius="35.0" />
+                                                                <StackPane fx:id="iconoAire" maxHeight="28.0" maxWidth="28.0" prefHeight="28.0" prefWidth="28.0" />
+                                                            </children>
+                                                        </StackPane>
+                                                        <Label fx:id="lblAireNivel" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #0b2e2b;" text="Regular" textAlignment="CENTER" />
+                                                        <Label fx:id="lblAireDetalle" style="-fx-font-size: 10px; -fx-text-fill: #64748b;" text="Calidad de aire" textAlignment="CENTER" />
+                                                        <!-- Barrita indicadora de color -->
+                                                        <Region fx:id="barraAire" maxHeight="5.0" maxWidth="55.0" prefHeight="5.0" prefWidth="55.0" style="-fx-background-color: #f59e0b; -fx-background-radius: 3;" />
+                                                    </children>
+                                                </VBox>
+
+                                                <!-- 3. Radiación UV -->
+                                                <VBox alignment="TOP_CENTER" spacing="6.0" prefWidth="100.0">
+                                                    <children>
+                                                        <StackPane prefHeight="72.0" prefWidth="72.0" style="-fx-background-color: #f8fafc; -fx-background-radius: 36;">
+                                                            <children>
+                                                                <Circle fill="#f1f5f9" radius="35.0" />
+                                                                <VBox alignment="CENTER" spacing="-4.0" translateY="1.0">
+                                                                    <children>
+                                                                        <Label fx:id="lblUvValor" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #0b2e2b;" text="0" />
+                                                                        <Label style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #0b2e2b;" text="UV" />
+                                                                    </children>
+                                                                </VBox>
+                                                            </children>
+                                                        </StackPane>
+                                                        <Label fx:id="lblUvNivel" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #0b2e2b;" text="Bajo" textAlignment="CENTER" />
+                                                        <Label fx:id="lblUvDetalle" managed="false" visible="false" />
+                                                        <!-- Barrita indicadora de color -->
+                                                        <Region fx:id="barraUV" maxHeight="5.0" maxWidth="55.0" prefHeight="5.0" prefWidth="55.0" style="-fx-background-color: #16a34a; -fx-background-radius: 3;" />
+                                                    </children>
+                                                </VBox>
+
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </StackPane>
+
+                        <!-- Botones de Acceso Rápido (Sin Emojis) -->
+                        <VBox alignment="CENTER_LEFT" maxWidth="850.0" spacing="12.0">
+                            <children>
+                                <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="Módulos de Acceso Rápido" />
+
+                                <HBox alignment="CENTER" spacing="20.0">
+                                    <children>
+                                        <Button maxWidth="1.7976931348623157E308" onAction="#mostrarConsultaPublica" prefHeight="85.0" prefWidth="260.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #cbd5e1; -fx-border-radius: 12; -fx-cursor: hand; -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="Movilidad&#10;(Rutas y Horarios)" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
+
+                                        <Button maxWidth="1.7976931348623157E308" onAction="#mostrarModuloSeguridad" prefHeight="85.0" prefWidth="260.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #cbd5e1; -fx-border-radius: 12; -fx-cursor: hand; -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="Seguridad&#10;(Directorio y Alerta)" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
+
+                                        <Button maxWidth="1.7976931348623157E308" onAction="#mostrarModuloIncidencias" prefHeight="85.0" prefWidth="260.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #cbd5e1; -fx-border-radius: 12; -fx-cursor: hand; -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="Incidencias&#10;(Reportes Activos)" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+
+                    </children>
+                </VBox>
+            </children>
+        </StackPane>
+    </center>
+
+    <!-- Barra de Menú Inferior (Sin Emojis) -->
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="12.0" style="-fx-background-color: #ffffff; -fx-border-color: #e2e8f0; -fx-border-width: 1 0 0 0; -fx-padding: 12 24;">
+            <children>
+                <Button fx:id="btnInicio" onAction="#mostrarInicio" style="-fx-background-color: #0d3b35; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 6; -fx-cursor: hand;" text="Inicio" />
+
+                <Button fx:id="btnVerRutas" onAction="#mostrarConsultaPublica" style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 6; -fx-cursor: hand;" text="Ver Rutas y Horarios" />
+
+                <Button fx:id="btnPanelAdmin" managed="false" onAction="#mostrarPanelAdmin" style="-fx-background-color: #0f172a; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 6; -fx-cursor: hand;" text="Panel de Administración" visible="false" />
+
+                <Region HBox.hgrow="ALWAYS" />
+
+                <Label fx:id="lblUsuarioMenu" style="-fx-text-fill: #475569; -fx-font-size: 13px;" text="¿Eres administrador?" />
+                <Button fx:id="btnAccesoUsuario" onAction="#abrirDialogoLogin" style="-fx-background-color: #f1f5f9; -fx-text-fill: #0f172a; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-background-radius: 6; -fx-font-weight: bold; -fx-padding: 8 16; -fx-cursor: hand;" text="Iniciar Sesión" />
+                <Button fx:id="btnCerrarSesion" managed="false" onAction="#cerrarSesion" style="-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 6; -fx-cursor: hand;" text="Cerrar Sesión" visible="false" />
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>

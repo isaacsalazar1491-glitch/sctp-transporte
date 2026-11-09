@@ -1,1 +1,108 @@
-<!-- Vista publica para usuarios/pasajeros -->
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="600.0" prefWidth="1080.0" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.sctp.transporte.controller.ConsultaPublicaController">
+
+    <!-- Buscador superior de rutas -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: #ffffff; -fx-padding: 14; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+            <children>
+                <Label style="-fx-font-weight: bold; -fx-text-fill: #1e293b; -fx-font-size: 14px;" text="Buscar Ruta o Parada:" />
+                <TextField fx:id="txtBuscar" onKeyReleased="#handleBuscar" promptText="Ej. Centro, Ruta 1, Terminal..." style="-fx-padding: 8 12; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6;" HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleBuscar" style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 6; -fx-cursor: hand;" text="Buscar" />
+                <Button onAction="#handleLimpiar" style="-fx-background-color: #f1f5f9; -fx-text-fill: #334155; -fx-padding: 8 14; -fx-background-radius: 6; -fx-cursor: hand;" text="Ver Todas" />
+            </children>
+        </HBox>
+    </top>
+
+    <!-- Panel dividido: Lista de Rutas a la izquierda, Detalles a la derecha -->
+    <center>
+        <SplitPane dividerPositions="0.36" style="-fx-background-color: transparent; -fx-padding: 12 0 0 0;">
+            <items>
+                <!-- Columna Izquierda: Rutas Activas -->
+                <VBox spacing="8.0" style="-fx-background-color: #ffffff; -fx-padding: 14; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+                    <children>
+                        <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #0f172a;" text="📍 Rutas Disponibles" />
+                        <Label style="-fx-font-size: 12px; -fx-text-fill: #64748b;" text="Selecciona una ruta para ver paradas y horarios:" />
+                        <ListView fx:id="listaRutas" VBox.vgrow="ALWAYS" />
+                    </children>
+                </VBox>
+
+                <!-- Columna Derecha: Paradas, Horarios, Unidades e Incidencias -->
+                <VBox spacing="10.0" style="-fx-background-color: #ffffff; -fx-padding: 14; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+                    <children>
+                        <Label fx:id="lblRutaSeleccionada" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="Selecciona una ruta de la lista" />
+
+                        <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                            <tabs>
+                                <Tab text="🚏 Paradas y Próximas Llegadas">
+                                    <content>
+                                        <SplitPane dividerPositions="0.5" style="-fx-padding: 8;">
+                                            <items>
+                                                <VBox spacing="6.0" style="-fx-padding: 6;">
+                                                    <children>
+                                                        <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Paradas de la ruta (clic para ver llegadas):" />
+                                                        <ListView fx:id="listaParadas" VBox.vgrow="ALWAYS" />
+                                                    </children>
+                                                </VBox>
+                                                <VBox spacing="6.0" style="-fx-padding: 6;">
+                                                    <children>
+                                                        <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Próximas llegadas estimadas a esta parada:" />
+                                                        <ListView fx:id="listaLlegadas" VBox.vgrow="ALWAYS" />
+                                                    </children>
+                                                </VBox>
+                                            </items>
+                                        </SplitPane>
+                                    </content>
+                                </Tab>
+
+                                <Tab text="🕒 Horarios de Salida">
+                                    <content>
+                                        <VBox spacing="6.0" style="-fx-padding: 10;">
+                                            <children>
+                                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Salidas programadas de unidades operativas:" />
+                                                <ListView fx:id="listaHorarios" VBox.vgrow="ALWAYS" />
+                                            </children>
+                                        </VBox>
+                                    </content>
+                                </Tab>
+
+                                <Tab text="🚌 Unidades Operativas">
+                                    <content>
+                                        <VBox spacing="6.0" style="-fx-padding: 10;">
+                                            <children>
+                                                <Label style="-fx-font-weight: bold; -fx-text-fill: #334155;" text="Disponibilidad de unidades en la ruta:" />
+                                                <ListView fx:id="listaUnidades" VBox.vgrow="ALWAYS" />
+                                            </children>
+                                        </VBox>
+                                    </content>
+                                </Tab>
+
+                                <Tab text="⚠️ Incidencias Activas">
+                                    <content>
+                                        <VBox spacing="6.0" style="-fx-padding: 10;">
+                                            <children>
+                                                <Label style="-fx-font-weight: bold; -fx-text-fill: #dc2626;" text="Avisos e incidencias reportadas:" />
+                                                <ListView fx:id="listaIncidencias" VBox.vgrow="ALWAYS" />
+                                            </children>
+                                        </VBox>
+                                    </content>
+                                </Tab>
+                            </tabs>
+                        </TabPane>
+                    </children>
+                </VBox>
+            </items>
+        </SplitPane>
+    </center>
+</BorderPane>

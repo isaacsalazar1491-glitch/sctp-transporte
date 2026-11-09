@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Mapa SCTP Toluca</title>
+    <!-- CSS de Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #f1f5f9;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+
+<!-- Script de Leaflet -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // Coordenadas centrales de Toluca / Tianguistenco
+    var tolucaCenter = [19.2886, -99.5961];
+
+    // Definir límites estrictos para la zona (Evita que el mapa cargue todo el mundo y se trabe)
+    var bounds = L.latLngBounds(
+        [19.05, -99.85], // Esquina suroeste
+        [19.55, -99.30]  // Esquina noreste
+    );
+
+    // Inicializar el mapa limitado
+    var map = L.map('map', {
+        center: tolucaCenter,
+        zoom: 13,
+        minZoom: 11,
+        maxZoom: 17,
+        maxBounds: bounds,
+        maxBoundsViscosity: 1.0
+    });
+
+    // Capa de OpenStreetMap optimizada
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    // Función para agregar marcadores
+    function agregarMarcador(lat, lng, titulo) {
+        L.marker([lat, lng]).addTo(map)
+            .bindPopup(titulo)
+            .openPopup();
+    }
+</script>
+</body>
+</html>
