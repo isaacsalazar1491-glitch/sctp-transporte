@@ -5,3 +5,4 @@ public interface MemoryMXBean
     MemoryUsage getHeapMemoryUsage();
     MemoryUsage getNonHeapMemoryUsage();
 }
+

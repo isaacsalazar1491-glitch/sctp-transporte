@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>SCTP Toluca - Red de Movilidad y Rutas</title>
+    <!-- css local empaquetado de leaflet -->
+    <link rel="stylesheet" href="file:///android_asset/leaflet.css" />
+    <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #cbd5e1;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden;
+        }
+
+        /* radar pulsante de ubicacion del usuario */
+        .user-pulse-container {
+            position: relative;
+            width: 24px;
+            height: 24px;
+        }
+        .user-pulse-ring {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            top: -4px;
+            left: -4px;
+            border-radius: 50%;
+            background-color: rgba(37, 99, 235, 0.45);
+            animation: pulse 1.8s infinite ease-out;
+        }
+        .user-pulse-dot {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 4px;
+            left: 4px;
+            border-radius: 50%;
+            background-color: #2563eb;
+            border: 3px solid #ffffff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.6); opacity: 1; }
+            100% { transform: scale(2.3); opacity: 0; }
+        }
+
+        /* marcadores de paradas sctp */
+        .parada-marker {
+            background-color: #ffffff;
+            border: 2.5px solid #047857;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            color: #064e3b;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+        }
+        .parada-marker.ruta-1 { border-color: #2563eb; color: #1d4ed8; }
+        .parada-marker.ruta-2 { border-color: #047857; color: #064e3b; }
+
+        /* popups estilizados */
+        .leaflet-popup-content-wrapper {
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+            padding: 4px 6px;
+            font-size: 12px;
+        }
+        .popup-titulo {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 2px;
+        }
+        .popup-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-top: 4px;
+        }
+        .badge-azul { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .badge-verde { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- js local empaquetado de leaflet -->
+<script src="file:///android_asset/leaflet.js"></script>
+<script>
+    // delimitacion para toluca, metepec, lerma y tianguistenco
+    var boundsValle = L.latLngBounds(
+        [19.1000, -99.8000],
+        [19.4000, -99.4000]
+    );
+
+    // centro en toluca
+    var centro = [19.2840, -99.6420];
+
+    var map = L.map('map', {
+        center: centro,
+        zoom: 13,
+        minZoom: 10,
+        maxZoom: 18,
+        maxBounds: boundsValle,
+        maxBoundsViscosity: 0.8,
+        zoomControl: true,
+        attributionControl: false
+    });
+
+    // capas de mapas con soporte dual (openstreetmap y esri)
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        subdomains: ['a', 'b', 'c']
+    }).addTo(map);
+
+    // marcador de ubicacion de referencia (av. buenavista y calz. del panteon)
+    var coordsUsuario = [19.2820, -99.6360];
+    var iconoUsuario = L.divIcon({
+        className: 'user-pulse-container',
+        html: '<div class="user-pulse-ring"></div><div class="user-pulse-dot"></div>',
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+    });
+
+    L.marker(coordsUsuario, { icon: iconoUsuario, zIndexOffset: 2000 })
+        .addTo(map)
+        .bindPopup(
+            '<div class="popup-titulo">📍 Tu ubicacion actual</div>' +
+            '<div>Av. Buenavista y Calz. del Panteon</div>' +
+            '<div class="popup-badge badge-azul">Valle de Toluca</div>'
+        );
+
+    var capaParadas = L.layerGroup().addTo(map);
+
+    // funcion llamada desde android para renderizar paradas
+    window.cargarParadasJson = function(paradasJson) {
+        try {
+            var lista = typeof paradasJson === 'string' ? JSON.parse(paradasJson) : paradasJson;
+            capaParadas.clearLayers();
+            var puntos = [coordsUsuario];
+
+            lista.forEach(function(p) {
+                if (!p.latitud || !p.longitud) return;
+
+                var icono = L.divIcon({
+                    className: 'parada-marker ruta-' + (p.idRuta || 1),
+                    html: p.orden || '•',
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                });
+
+                var m = L.marker([p.latitud, p.longitud], { icon: icono });
+                m.bindPopup(
+                    '<div class="popup-titulo">🚏 ' + p.nombre + '</div>' +
+                    '<div>Parada #' + p.orden + ' · +' + p.minutosDesdeOrigen + ' min</div>' +
+                    '<div class="popup-badge badge-verde">Operando normalmente</div>'
+                );
+                m.addTo(capaParadas);
+                puntos.push([p.latitud, p.longitud]);
+            });
+
+            if (puntos.length > 1) {
+                map.fitBounds(puntos, { padding: [40, 40], maxZoom: 15 });
+            }
+        } catch(e) {
+            console.error('error al parsear paradas:', e);
+        }
+    };
+
+    // funcion para forzar renderizado y recalculo de tamano en webview
+    function forzarRedimension() {
+        if (typeof map !== 'undefined' && map) {
+            map.invalidateSize(true);
+        }
+    }
+
+    setTimeout(forzarRedimension, 250);
+    setTimeout(forzarRedimension, 700);
+    setTimeout(forzarRedimension, 1500);
+</script>
+
+</body>
+</html>

@@ -5,42 +5,89 @@
     android:background="@color/background"
     android:orientation="vertical">
 
+    <!-- cabecera sctp -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/primary"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="16dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🚏 Paradas de Transporte"
+            android:text="🚏 Paradas y Mapa del Valle de Toluca"
             android:textColor="#ffffff"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:text="Red de Movilidad del Valle de Toluca"
+            android:text="Geolocalizacion satelital e itinerarios oficiales"
             android:textColor="#cbd5e1"
             android:textSize="12sp" />
+
+        <!-- selector de vista: mapa interactivo o lista -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_marginTop="12dp"
+            android:background="#0f172a"
+            android:orientation="horizontal"
+            android:padding="2dp">
+
+            <Button
+                android:id="@+id/btnVerMapa"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:backgroundTint="#047857"
+                android:elevation="0dp"
+                android:text="🗺️ Mapa Interactivo"
+                android:textColor="#ffffff"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnVerLista"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:backgroundTint="#1e293b"
+                android:elevation="0dp"
+                android:text="📋 Lista de Paradas"
+                android:textColor="#cbd5e1"
+                android:textSize="12sp" />
+        </LinearLayout>
     </LinearLayout>
 
-    <ProgressBar
-        android:id="@+id/progressBarParadas"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="32dp" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvParadas"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp" />
+        android:layout_height="match_parent">
+
+        <!-- vista del mapa webview con leaflet -->
+        <WebView
+            android:id="@+id/webViewMapa"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+
+        <!-- vista de lista tradicional -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvParadas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            android:visibility="gone" />
+
+        <ProgressBar
+            android:id="@+id/progressBarParadas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+
+    </FrameLayout>
 
 </LinearLayout>
-
