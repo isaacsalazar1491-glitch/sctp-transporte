@@ -1,0 +1,57 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="400dp"
+    android:height="360dp"
+    android:viewportWidth="400"
+    android:viewportHeight="360">
+
+    <!-- Fondo de mapa color celeste suave -->
+    <path
+        android:fillColor="#e2eaf5"
+        android:pathData="M0,0h400v360h-400z" />
+
+    <!-- Bloques y calles blancas estilo mapa vectorial -->
+    <!-- Calles verticales anchas blancas -->
+    <path
+        android:fillColor="#ffffff"
+        android:pathData="M32,0h16v360h-16z M135,0h18v360h-18z M265,0h18v360h-18z M360,0h16v360h-16z" />
+
+    <!-- Calles horizontales anchas blancas -->
+    <path
+        android:fillColor="#ffffff"
+        android:pathData="M0,82h400v18h-400z M0,185h400v18h-400z M0,285h400v18h-400z" />
+
+    <!-- Calles diagonales estilizadas -->
+    <path
+        android:strokeColor="#ffffff"
+        android:strokeWidth="20"
+        android:pathData="M-20,130 L420,50 M-20,310 L420,220" />
+
+    <!-- Trazo de caminata peatonal con puntos azules -->
+    <!-- Puntos circulares individuales para maxima fidelidad -->
+    <path
+        android:fillColor="#1d4ed8"
+        android:pathData="
+            M155,225m-4,0a4,4 0 1,1 8,0a4,4 0 1,1 -8,0
+            M168,212m-4,0a4,4 0 1,1 8,0a4,4 0 1,1 -8,0
+            M182,201m-4,0a4,4 0 1,1 8,0a4,4 0 1,1 -8,0
+            M198,193m-4,0a4,4 0 1,1 8,0a4,4 0 1,1 -8,0
+            M216,187m-4,0a4,4 0 1,1 8,0a4,4 0 1,1 -8,0
+            M234,178m-4,0a4,4 0 1,1 8,0a4,4 0 1,1 -8,0
+            M250,165m-4,0a4,4 0 1,1 8,0a4,4 0 1,1 -8,0
+            M260,150m-4,0a4,4 0 1,1 8,0a4,4 0 1,1 -8,0" />
+
+    <!-- Parada de autobus: circulo amarillo con borde negro grueso -->
+    <path
+        android:fillColor="#facc15"
+        android:strokeColor="#0f172a"
+        android:strokeWidth="4"
+        android:pathData="M280,126m-19,0a19,19 0 1,1 38,0a19,19 0 1,1 -38,0" />
+
+    <!-- Lineas horizontales dentro de la parada icono = -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#0f172a"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M272,122 h16 M272,130 h16" />
+</vector>

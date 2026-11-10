@@ -1,7 +1,7 @@
 <resources>
-    <color name="primary">#0d3b35</color>
-    <color name="primary_dark">#082420</color>
-    <color name="accent">#2563eb</color>
+    <color name="primary">#0f172a</color>
+    <color name="primary_dark">#020617</color>
+    <color name="accent">#1d4ed8</color>
     <color name="accent_light">#eff6ff</color>
     <color name="background">#f8fafc</color>
     <color name="card_bg">#ffffff</color>
@@ -12,4 +12,3 @@
     <color name="danger">#dc2626</color>
     <color name="border">#e2e8f0</color>
 </resources>
-

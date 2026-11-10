@@ -2,7 +2,7 @@ package com.sctp.movil;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,9 +15,13 @@ import java.sql.Connection;
 public class MainActivity extends AppCompatActivity
 {
     private TextView lblEstadoConexion;
-    private Button btnIrRutas;
-    private Button btnIrParadas;
-    private Button btnIrIncidencias;
+    private View cardRutas;
+    private View cardParadas;
+    private View cardIncidencias;
+    private View btnComoLlegar;
+    private View btnBuscarDestino;
+    private View cardMapaVista;
+    private View btnFavorito;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -25,36 +29,97 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // enlace de vistas principales
         lblEstadoConexion = findViewById(R.id.lblEstadoConexion);
-        btnIrRutas = findViewById(R.id.btnIrRutas);
-        btnIrParadas = findViewById(R.id.btnIrParadas);
-        btnIrIncidencias = findViewById(R.id.btnIrIncidencias);
+        cardRutas = findViewById(R.id.cardRutas);
+        cardParadas = findViewById(R.id.cardParadas);
+        cardIncidencias = findViewById(R.id.cardIncidencias);
+        btnComoLlegar = findViewById(R.id.btnComoLlegar);
+        btnBuscarDestino = findViewById(R.id.btnBuscarDestino);
+        cardMapaVista = findViewById(R.id.cardMapaVista);
+        btnFavorito = findViewById(R.id.btnFavorito);
 
         verificarConexionRemota();
+        configurarEventos();
+    }
 
-        btnIrRutas.setOnClickListener(v ->
+    private void configurarEventos()
+    {
+        // navegacion a lista de rutas
+        if (cardRutas != null)
         {
-            Intent intent = new Intent(MainActivity.this, RutasActivity.class);
-            startActivity(intent);
-        });
+            cardRutas.setOnClickListener(v ->
+            {
+                Intent intent = new Intent(MainActivity.this, RutasActivity.class);
+                startActivity(intent);
+            });
+        }
 
-        btnIrParadas.setOnClickListener(v ->
+        // navegacion a paradas y mapa
+        if (cardParadas != null)
         {
-            Intent intent = new Intent(MainActivity.this, ParadasActivity.class);
-            startActivity(intent);
-        });
+            cardParadas.setOnClickListener(v ->
+            {
+                Intent intent = new Intent(MainActivity.this, ParadasActivity.class);
+                startActivity(intent);
+            });
+        }
 
-        btnIrIncidencias.setOnClickListener(v ->
+        // navegacion a incidencias y alertas
+        if (cardIncidencias != null)
         {
-            Intent intent = new Intent(MainActivity.this, IncidenciasActivity.class);
-            startActivity(intent);
-        });
+            cardIncidencias.setOnClickListener(v ->
+            {
+                Intent intent = new Intent(MainActivity.this, IncidenciasActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        // boton como llegar abre paradas y mapa
+        if (btnComoLlegar != null)
+        {
+            btnComoLlegar.setOnClickListener(v ->
+            {
+                Intent intent = new Intent(MainActivity.this, ParadasActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        // clic en la tarjeta de mapa
+        if (cardMapaVista != null)
+        {
+            cardMapaVista.setOnClickListener(v ->
+            {
+                Intent intent = new Intent(MainActivity.this, ParadasActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        // clic en la barra de busqueda
+        if (btnBuscarDestino != null)
+        {
+            btnBuscarDestino.setOnClickListener(v ->
+            {
+                Intent intent = new Intent(MainActivity.this, ParadasActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        // boton de favoritos
+        if (btnFavorito != null)
+        {
+            btnFavorito.setOnClickListener(v ->
+            {
+                Toast.makeText(MainActivity.this, "Parada guardada en favoritos", Toast.LENGTH_SHORT).show();
+            });
+        }
     }
 
     private void verificarConexionRemota()
     {
         lblEstadoConexion.setText("● Conectando a PostgreSQL (100.127.110.88)...");
-        lblEstadoConexion.setBackgroundColor(0xffd97706);
+        lblEstadoConexion.setBackgroundColor(0xfffef3c7);
+        lblEstadoConexion.setTextColor(0xff92400e);
 
         ConexionMovil.ejecutar(() ->
         {
@@ -69,19 +134,19 @@ public class MainActivity extends AppCompatActivity
             {
                 if (conectado)
                 {
-                    lblEstadoConexion.setText("● Conectado a servidor PostgreSQL (100.127.110.88)");
-                    lblEstadoConexion.setBackgroundColor(0xff14532d);
+                    lblEstadoConexion.setText("● Conectado a servidor PostgreSQL");
+                    lblEstadoConexion.setBackgroundColor(0xffdcfce7);
+                    lblEstadoConexion.setTextColor(0xff166534);
                 }
             }
 
             @Override
             public void onError(Exception e)
             {
-                lblEstadoConexion.setText("● Error de conexión: " + e.getMessage());
-                lblEstadoConexion.setBackgroundColor(0xffb91c1c);
-                Toast.makeText(MainActivity.this, "No se pudo conectar al servidor: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                lblEstadoConexion.setText("● Modo fuera de línea");
+                lblEstadoConexion.setBackgroundColor(0xfffee2e2);
+                lblEstadoConexion.setTextColor(0xff991b1b);
             }
         });
     }
 }
-

@@ -9,156 +9,373 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="24dp">
 
-        <!-- Header superior institucional SCTP -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <!-- Indicador discreto de conexion postgresql -->
+        <TextView
+            android:id="@+id/lblEstadoConexion"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/primary"
-            android:orientation="vertical"
-            android:padding="24dp">
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="8dp"
+            android:background="#e2e8f0"
+            android:paddingStart="10dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="3dp"
+            android:text="● Conectado a PostgreSQL"
+            android:textColor="#334155"
+            android:textSize="11sp"
+            android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🐝 SCTP Móvil"
-                android:textColor="#ffffff"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Sistema de Control de Transporte Público • Toluca"
-                android:textColor="#cbd5e1"
-                android:textSize="13sp" />
-
-            <TextView
-                android:id="@+id/lblEstadoConexion"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="#14532d"
-                android:paddingStart="10dp"
-                android:paddingTop="4dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="4dp"
-                android:text="● Conectado a servidor PostgreSQL (100.127.110.88)"
-                android:textColor="#86efac"
-                android:textSize="11sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
+        <!-- Tarjeta superior de mapa interactivo e ilustrado -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardMapaVista"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:layout_height="390dp"
+            app:cardCornerRadius="28dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="#e2eaf5">
 
-            <!-- Tarjeta Parada Cercana (GPS Toluca) -->
-            <androidx.cardview.widget.CardView
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="3dp"
-                app:cardBackgroundColor="@color/card_bg">
+                android:layout_height="match_parent">
 
+                <!-- Ilustracion vectorial de mapa de calles y parada -->
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/bg_map_illustration" />
+
+                <!-- Barra de busqueda flotante -->
+                <LinearLayout
+                    android:id="@+id/btnBuscarDestino"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_gravity="top"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginEnd="14dp"
+                    android:background="@drawable/bg_search_pill"
+                    android:elevation="4dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_search" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="¿A dónde vas?"
+                        android:textColor="#475569"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Tarjeta superpuesta de la parada mas cercana -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/bg_card_overlay"
+                    android:elevation="4dp"
                     android:orientation="vertical"
-                    android:padding="18dp">
+                    android:padding="16dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <!-- Fila con titulo de parada y tiempo de llegada grande -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="📍 Tu ubicación y parada más cercana"
-                        android:textColor="@color/text_main"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
+                        android:orientation="horizontal">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="Av. Buenavista Y Calz. del Panteón"
-                        android:textColor="@color/accent"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="A 2 min caminando • Ruta OLIVO - CU"
-                        android:textColor="@color/text_muted"
-                        android:textSize="13sp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:letterSpacing="0.04"
+                                android:text="PARADA MÁS CERCANA · 2 MIN A PIE"
+                                android:textColor="#64748b"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                            <TextView
+                                android:id="@+id/lblNombreParadaCercana"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Av. Buenavista y Calz. del Panteón"
+                                android:textColor="#0f172a"
+                                android:textSize="17sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Indicador 6 min -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:gravity="bottom"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/lblTiempoMinutos"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:includeFontPadding="false"
+                                android:text="6"
+                                android:textColor="#1d4ed8"
+                                android:textSize="36sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="2dp"
+                                android:layout_marginBottom="4dp"
+                                android:includeFontPadding="false"
+                                android:text="min"
+                                android:textColor="#0f172a"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Fila de acciones y pills -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:background="#ecfdf5"
-                        android:paddingStart="8dp"
-                        android:paddingTop="4dp"
-                        android:paddingEnd="8dp"
-                        android:paddingBottom="4dp"
-                        android:text="🕒 Próximo autobús estimado: 6:10 a.m."
-                        android:textColor="@color/success"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
+                        android:layout_marginTop="14dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <!-- Pill 1: Ruta Olivo - CU -->
+                        <TextView
+                            android:id="@+id/btnPillRuta"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_pill_route"
+                            android:paddingStart="14dp"
+                            android:paddingTop="9dp"
+                            android:paddingEnd="14dp"
+                            android:paddingBottom="9dp"
+                            android:text="OLIVO – CU"
+                            android:textColor="#1d4ed8"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <!-- Pill 2: Boton Como llegar -->
+                        <TextView
+                            android:id="@+id/btnComoLlegar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_pill_action"
+                            android:paddingStart="16dp"
+                            android:paddingTop="9dp"
+                            android:paddingEnd="16dp"
+                            android:paddingBottom="9dp"
+                            android:text="Cómo llegar"
+                            android:textColor="#000000"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1" />
+
+                        <!-- Boton 3: Estrella favorita -->
+                        <FrameLayout
+                            android:id="@+id/btnFavorito"
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            android:background="@drawable/bg_pill_star">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_star" />
+                        </FrameLayout>
+                    </LinearLayout>
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
 
-            <!-- Sección Módulos de Transporte -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="12dp"
-                android:text="Módulos del Sistema"
-                android:textColor="@color/text_main"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+            </FrameLayout>
+        </androidx.cardview.widget.CardView>
 
-            <!-- Boton 1: Rutas -->
-            <Button
-                android:id="@+id/btnIrRutas"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:backgroundTint="@color/accent"
-                android:text="🚌 Consultar Rutas Activas"
-                android:textColor="#ffffff"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+        <!-- Cuadricula inferior de tarjetas de accion -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
 
-            <!-- Boton 2: Paradas y Mapa -->
-            <Button
-                android:id="@+id/btnIrParadas"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginTop="12dp"
-                android:backgroundTint="@color/primary"
-                android:text="🚏 Paradas y Mapa de Toluca"
-                android:textColor="#ffffff"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+            <!-- Columna izquierda: Tarjeta azul alta Consultar rutas activas -->
+            <FrameLayout
+                android:id="@+id/cardRutas"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_card_blue"
+                android:clickable="true"
+                android:elevation="3dp"
+                android:focusable="true"
+                android:padding="20dp">
 
-            <!-- Boton 3: Incidencias -->
-            <Button
-                android:id="@+id/btnIrIncidencias"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginTop="12dp"
-                android:backgroundTint="#d97706"
-                android:text="⚠️ Alertas e Incidencias en Vivo"
-                android:textColor="#ffffff"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+                <!-- Icono de autobus en circulo transparente -->
+                <FrameLayout
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="top|start"
+                    android:background="@drawable/bg_icon_circle">
 
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_bus" />
+                </FrameLayout>
+
+                <!-- Texto inferior -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|start"
+                    android:lineSpacingExtra="3dp"
+                    android:text="Consultar rutas\nactivas"
+                    android:textColor="#ffffff"
+                    android:textSize="19sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
+
+            <!-- Columna derecha: Dos tarjetas apiladas -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <!-- Tarjeta superior: Paradas y mapa (azul oscuro navy) -->
+                <FrameLayout
+                    android:id="@+id/cardParadas"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginBottom="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_card_navy"
+                    android:clickable="true"
+                    android:elevation="3dp"
+                    android:focusable="true"
+                    android:paddingStart="16dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:layout_marginEnd="12dp"
+                            android:src="@drawable/ic_pin" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:lineSpacingExtra="2dp"
+                            android:text="Paradas y\nmapa"
+                            android:textColor="#ffffff"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </FrameLayout>
+
+                <!-- Tarjeta inferior: Alertas en vivo (amarillo con badge 3) -->
+                <FrameLayout
+                    android:id="@+id/cardIncidencias"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_card_yellow"
+                    android:clickable="true"
+                    android:elevation="3dp"
+                    android:focusable="true"
+                    android:paddingStart="16dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="12dp">
+
+                    <!-- Badge con numero 3 en la esquina superior derecha -->
+                    <FrameLayout
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_gravity="top|end"
+                        android:background="@drawable/bg_badge_count">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="3"
+                            android:textColor="#ffffff"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </FrameLayout>
+
+                    <!-- Icono alerta y texto -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:layout_marginEnd="12dp"
+                            android:src="@drawable/ic_warning" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:lineSpacingExtra="2dp"
+                            android:text="Alertas en\nvivo"
+                            android:textColor="#000000"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </FrameLayout>
+
+            </LinearLayout>
         </LinearLayout>
+
     </LinearLayout>
 </ScrollView>
-
