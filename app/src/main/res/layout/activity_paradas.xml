@@ -1,137 +1,480 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
-    android:orientation="vertical">
+    android:background="@color/background">
 
-    <!-- cabecera sctp -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/primary"
-        android:orientation="vertical"
-        android:padding="16dp">
-
-        <TextView
-            android:id="@+id/lblTituloRutas"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="🚏 Red de Rutas del Valle de Toluca"
-            android:textColor="#ffffff"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/lblEstadoGps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="📡 Localizando GPS del dispositivo..."
-            android:textColor="#cbd5e1"
-            android:textSize="12sp" />
-
-        <!-- tarjeta de informacion del autobus en vivo cuando hay ruta seleccionada -->
-        <LinearLayout
-            android:id="@+id/layoutInfoAutobus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="#0f172a"
-            android:orientation="vertical"
-            android:padding="10dp"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/lblRutaSeleccionada"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🚍 Monitoreo en vivo: R-01 Tianguistenco – Toluca"
-                android:textColor="#38bdf8"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/lblEstimacionLlegada"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="⏱️ Autobús Eco. 14 en camino • Llegada estimada: Calculando..."
-                android:textColor="#fde047"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <!-- selector de vista: mapa interactivo o lista -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="38dp"
-            android:layout_marginTop="12dp"
-            android:background="#0f172a"
-            android:orientation="horizontal"
-            android:padding="2dp">
-
-            <Button
-                android:id="@+id/btnVerMapa"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:backgroundTint="#047857"
-                android:elevation="0dp"
-                android:text="🗺️ Mapa Interactivo"
-                android:textColor="#ffffff"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/btnVerLista"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:backgroundTint="#1e293b"
-                android:elevation="0dp"
-                android:text="📋 Lista de Paradas"
-                android:textColor="#cbd5e1"
-                android:textSize="12sp" />
-        </LinearLayout>
-    </LinearLayout>
-
+    <!-- Capa 1: Vista del mapa Leaflet y lista de paradas -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- vista del mapa webview con leaflet -->
         <WebView
             android:id="@+id/webViewMapa"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="visible" />
+            android:layout_height="match_parent" />
 
-        <!-- vista de lista tradicional -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvParadas"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="16dp"
+            android:layout_marginTop="160dp"
+            android:layout_marginBottom="90dp"
+            android:background="@color/background"
+            android:clipToPadding="false"
+            android:paddingStart="16dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="24dp"
             android:visibility="gone" />
-
-        <!-- boton flotante para centrar en mi ubicacion actual -->
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabMiUbicacion"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="20dp"
-            android:backgroundTint="#2563eb"
-            android:contentDescription="Mi Ubicación"
-            android:src="@android:drawable/ic_menu_mylocation"
-            android:tint="#ffffff" />
 
         <ProgressBar
             android:id="@+id/progressBarParadas"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center" />
-
+            android:layout_gravity="center"
+            android:indeterminateTint="#1d4ed8"
+            android:visibility="gone" />
     </FrameLayout>
 
-</LinearLayout>
+    <!-- Capa 2: Encabezado superior azul institucional y selector de rutas -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Cabecera azul institucional con esquinas redondeadas inferiores -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_routes_header"
+            android:elevation="6dp"
+            android:orientation="vertical"
+            android:paddingStart="18dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="18dp"
+            android:paddingBottom="18dp">
+
+            <!-- Fila superior con boton volver atras y titulo -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <!-- Boton circular volver atras -->
+                <FrameLayout
+                    android:id="@+id/btnVolverAtras"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/bg_circle_back"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_arrow_back" />
+                </FrameLayout>
+
+                <!-- Columna de titulo y estado de ubicacion -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/lblTituloRutas"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Red de rutas"
+                        android:textColor="#ffffff"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="●"
+                            android:textColor="#4ade80"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/lblEstadoGps"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:text="Ubicación activa"
+                            android:textColor="#e0e7ff"
+                            android:textSize="12.5sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Selector de pestanas estilo pildora oscura (Mapa vs Paradas) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_tabs_container"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="4dp">
+
+                <!-- Pestana 1: Mapa -->
+                <FrameLayout
+                    android:id="@+id/btnVerMapa"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_tab_active_yellow"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:id="@+id/lblTabMapa"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="Mapa"
+                        android:textColor="#000000"
+                        android:textSize="14.5sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
+
+                <!-- Pestana 2: Paradas -->
+                <FrameLayout
+                    android:id="@+id/btnVerLista"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:id="@+id/lblTabParadas"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="Paradas"
+                        android:textColor="#ffffff"
+                        android:textSize="14.5sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Fila de filtros flotantes de rutas (R-01, R-02, R-03) -->
+        <LinearLayout
+            android:id="@+id/layoutPillsRutas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="18dp"
+            android:paddingTop="14dp"
+            android:paddingEnd="18dp"
+            android:paddingBottom="6dp">
+
+            <!-- Pill R-01 Activa -->
+            <TextView
+                android:id="@+id/btnPillRuta1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_pill_route_selected"
+                android:clickable="true"
+                android:elevation="3dp"
+                android:focusable="true"
+                android:paddingStart="20dp"
+                android:paddingTop="9dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="9dp"
+                android:text="R-01"
+                android:textColor="#ffffff"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <!-- Pill R-02 Inactiva -->
+            <TextView
+                android:id="@+id/btnPillRuta2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_pill_route_unselected"
+                android:clickable="true"
+                android:elevation="2dp"
+                android:focusable="true"
+                android:paddingStart="20dp"
+                android:paddingTop="9dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="9dp"
+                android:text="R-02"
+                android:textColor="#0f172a"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <!-- Pill R-03 Inactiva -->
+            <TextView
+                android:id="@+id/btnPillRuta3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_pill_route_unselected"
+                android:clickable="true"
+                android:elevation="2dp"
+                android:focusable="true"
+                android:paddingStart="20dp"
+                android:paddingTop="9dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="9dp"
+                android:text="R-03"
+                android:textColor="#0f172a"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Capa 3: Boton flotante blanco de geolocalizacion GPS -->
+    <FrameLayout
+        android:id="@+id/fabMiUbicacion"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="18dp"
+        android:layout_marginBottom="215dp"
+        android:background="@drawable/bg_fab_white"
+        android:clickable="true"
+        android:elevation="5dp"
+        android:focusable="true">
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_my_location" />
+    </FrameLayout>
+
+    <!-- Capa 4: Tarjeta inferior de estimacion de llegada del autobus -->
+    <LinearLayout
+        android:id="@+id/layoutInfoAutobus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="94dp"
+        android:background="@drawable/bg_arrival_card"
+        android:elevation="6dp"
+        android:orientation="vertical"
+        android:padding="18dp">
+
+        <!-- Fila superior: etiqueta eco 14 y tiempo grande 32 min -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/lblUnidadEstado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.04"
+                    android:text="ECO. 14 · EN RUTA"
+                    android:textColor="#64748b"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/lblRutaSeleccionada"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="Llega a Terminal Tianguistenco"
+                    android:textColor="#0f172a"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Badge de tiempo grande: 32 min -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="bottom"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/lblTiempoNumero"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:text="32"
+                    android:textColor="#1d4ed8"
+                    android:textSize="34sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginBottom="3dp"
+                    android:includeFontPadding="false"
+                    android:text="min"
+                    android:textColor="#0f172a"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Barra de progreso horizontal del trayecto -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_progress_track">
+
+            <View
+                android:id="@+id/barraProgresoTrayecto"
+                android:layout_width="42dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_progress_indicator" />
+        </FrameLayout>
+
+        <!-- Fila inferior: Detalle de estimacion y chip En vivo -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/lblEstimacionLlegada"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Llegada estimada 00:41 · 10% del trayecto"
+                android:textColor="#475569"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="● En vivo"
+                android:textColor="#16a34a"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Capa 5: Barra de navegacion inferior dock oscura -->
+    <LinearLayout
+        android:id="@+id/layoutBottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="62dp"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="18dp"
+        android:background="@drawable/bg_bottom_nav"
+        android:elevation="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <!-- Icono 1: Inicio -->
+        <FrameLayout
+            android:id="@+id/btnNavHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_home" />
+        </FrameLayout>
+
+        <!-- Icono 2: Red de Rutas -->
+        <FrameLayout
+            android:id="@+id/btnNavRutas"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_routes" />
+        </FrameLayout>
+
+        <!-- Icono 3: Pill amarilla activa Mapa -->
+        <LinearLayout
+            android:id="@+id/btnNavMapa"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_nav_active_pill"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_map_folded" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Mapa"
+                android:textColor="#0f172a"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Icono 4: Alertas e Incidencias -->
+        <FrameLayout
+            android:id="@+id/btnNavAlertas"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_bell" />
+        </FrameLayout>
+    </LinearLayout>
+
+</FrameLayout>
