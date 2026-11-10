@@ -12,10 +12,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,8 +48,13 @@ public class ParadasActivity extends AppCompatActivity
     private WebView webViewMapa;
     private Button btnVerMapa;
     private Button btnVerLista;
+    private TextView lblTituloRutas;
     private TextView lblEstadoGps;
     private FloatingActionButton fabMiUbicacion;
+
+    private LinearLayout layoutInfoAutobus;
+    private TextView lblRutaSeleccionada;
+    private TextView lblEstimacionLlegada;
 
     private LocationManager locationManager;
     private LocationListener locationListener;
@@ -56,6 +63,9 @@ public class ParadasActivity extends AppCompatActivity
     private final List<ParadaMovil> listaParadas = new ArrayList<>();
     private ParadasAdapter adapter;
     private boolean mapaListo = false;
+    private int idRutaFiltro = 0;
+    private String nombreRutaFiltro = null;
+    private String claveRutaFiltro = null;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -64,13 +74,31 @@ public class ParadasActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_paradas);
 
+        // obtener parametros enviados desde RutasActivity
+        idRutaFiltro = getIntent().getIntExtra("id_ruta", 0);
+        nombreRutaFiltro = getIntent().getStringExtra("nombre_ruta");
+        claveRutaFiltro = getIntent().getStringExtra("clave_ruta");
+
         progressBar = findViewById(R.id.progressBarParadas);
         rvParadas = findViewById(R.id.rvParadas);
         webViewMapa = findViewById(R.id.webViewMapa);
         btnVerMapa = findViewById(R.id.btnVerMapa);
         btnVerLista = findViewById(R.id.btnVerLista);
+        lblTituloRutas = findViewById(R.id.lblTituloRutas);
         lblEstadoGps = findViewById(R.id.lblEstadoGps);
         fabMiUbicacion = findViewById(R.id.fabMiUbicacion);
+
+        layoutInfoAutobus = findViewById(R.id.layoutInfoAutobus);
+        lblRutaSeleccionada = findViewById(R.id.lblRutaSeleccionada);
+        lblEstimacionLlegada = findViewById(R.id.lblEstimacionLlegada);
+
+        if (idRutaFiltro > 0 && nombreRutaFiltro != null)
+        {
+            lblTituloRutas.setText("🚏 " + claveRutaFiltro + " · " + nombreRutaFiltro);
+            layoutInfoAutobus.setVisibility(View.VISIBLE);
+            lblRutaSeleccionada.setText("🚍 Monitoreo en vivo: " + claveRutaFiltro + " " + nombreRutaFiltro);
+            lblEstimacionLlegada.setText("⏱️ Autobús Eco. 14 en ruta • Calculando llegada...");
+        }
 
         rvParadas.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ParadasAdapter(listaParadas);
@@ -91,6 +119,9 @@ public class ParadasActivity extends AppCompatActivity
         settings.setDatabaseEnabled(true);
         settings.setLoadWithOverviewMode(true);
         settings.setUseWideViewPort(true);
+
+        // interfaz javascript para recibir actualizaciones de tiempo estimado
+        webViewMapa.addJavascriptInterface(new BridgeJS(), "AndroidBridge");
 
         webViewMapa.setWebViewClient(new WebViewClient()
         {
@@ -199,7 +230,6 @@ public class ParadasActivity extends AppCompatActivity
         {
             if (locationManager == null) return;
 
-            // obtener ultima posicion conocida de inmediato
             Location locGps = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             Location locNet = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             Location loc = locGps != null ? locGps : locNet;
@@ -214,7 +244,6 @@ public class ParadasActivity extends AppCompatActivity
                 }
             }
 
-            // escuchar actualizaciones continuas
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
             {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 5, locationListener);
@@ -242,7 +271,7 @@ public class ParadasActivity extends AppCompatActivity
             }
             else
             {
-                lblEstadoGps.setText("⚠️ Permiso de GPS no otorgado (mostrando zona Buenavista)");
+                lblEstadoGps.setText("⚠️ Permiso de GPS no otorgado");
             }
         }
     }
@@ -266,23 +295,38 @@ public class ParadasActivity extends AppCompatActivity
         ConexionMovil.ejecutar(() ->
         {
             List<ParadaMovil> resultado = new ArrayList<>();
-            String sql = "SELECT id_parada, id_ruta, nombre, orden, minutos_desde_origen, latitud, longitud FROM parada ORDER BY orden ASC";
+            String sql;
+            if (idRutaFiltro > 0)
+            {
+                sql = "SELECT id_parada, id_ruta, nombre, orden, minutos_desde_origen, latitud, longitud FROM parada WHERE id_ruta = ? ORDER BY orden ASC";
+            }
+            else
+            {
+                sql = "SELECT id_parada, id_ruta, nombre, orden, minutos_desde_origen, latitud, longitud FROM parada ORDER BY orden ASC";
+            }
 
             try (Connection con = ConexionMovil.obtenerConexionDirecta();
-                 PreparedStatement ps = con.prepareStatement(sql);
-                 ResultSet rs = ps.executeQuery())
+                 PreparedStatement ps = con.prepareStatement(sql))
             {
-                while (rs.next())
+                if (idRutaFiltro > 0)
                 {
-                    resultado.add(new ParadaMovil(
-                            rs.getInt("id_parada"),
-                            rs.getInt("id_ruta"),
-                            rs.getString("nombre"),
-                            rs.getInt("orden"),
-                            rs.getInt("minutos_desde_origen"),
-                            rs.getDouble("latitud"),
-                            rs.getDouble("longitud")
-                    ));
+                    ps.setInt(1, idRutaFiltro);
+                }
+
+                try (ResultSet rs = ps.executeQuery())
+                {
+                    while (rs.next())
+                    {
+                        resultado.add(new ParadaMovil(
+                                rs.getInt("id_parada"),
+                                rs.getInt("id_ruta"),
+                                rs.getString("nombre"),
+                                rs.getInt("orden"),
+                                rs.getInt("minutos_desde_origen"),
+                                rs.getDouble("latitud"),
+                                rs.getDouble("longitud")
+                        ));
+                    }
                 }
             }
             return resultado;
@@ -340,7 +384,7 @@ public class ParadasActivity extends AppCompatActivity
         }
         json.append("]");
 
-        String script = "javascript:window.cargarParadasJson('" + json.toString().replace("'", "\\'") + "');";
+        String script = "javascript:window.cargarParadasJson('" + json.toString().replace("'", "\\'") + "', " + idRutaFiltro + ");";
         webViewMapa.evaluateJavascript(script, null);
     }
 
@@ -351,6 +395,21 @@ public class ParadasActivity extends AppCompatActivity
         if (locationManager != null && locationListener != null)
         {
             locationManager.removeUpdates(locationListener);
+        }
+    }
+
+    public class BridgeJS
+    {
+        @JavascriptInterface
+        public void notificarEstimacion(String hora, int minutos)
+        {
+            runOnUiThread(() ->
+            {
+                if (lblEstimacionLlegada != null)
+                {
+                    lblEstimacionLlegada.setText("⏱️ Autobús Eco. 14 en ruta • Llegada estimada: " + hora + " (en " + minutos + " min)");
+                }
+            });
         }
     }
 

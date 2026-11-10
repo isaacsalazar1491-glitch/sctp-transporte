@@ -1,5 +1,6 @@
 package com.sctp.movil;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +40,14 @@ public class RutasActivity extends AppCompatActivity
         rvRutas = findViewById(R.id.rvRutas);
 
         rvRutas.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new RutasAdapter(listaRutas);
+        adapter = new RutasAdapter(listaRutas, ruta ->
+        {
+            Intent intent = new Intent(RutasActivity.this, ParadasActivity.class);
+            intent.putExtra("id_ruta", ruta.getId());
+            intent.putExtra("nombre_ruta", ruta.getNombre());
+            intent.putExtra("clave_ruta", ruta.getClave());
+            startActivity(intent);
+        });
         rvRutas.setAdapter(adapter);
 
         cargarRutasDesdeServidor();
@@ -89,13 +97,20 @@ public class RutasActivity extends AppCompatActivity
         });
     }
 
+    public interface OnRutaClickListener
+    {
+        void onRutaClick(RutaMovil ruta);
+    }
+
     private static class RutasAdapter extends RecyclerView.Adapter<RutasAdapter.ViewHolder>
     {
         private final List<RutaMovil> items;
+        private final OnRutaClickListener listener;
 
-        public RutasAdapter(List<RutaMovil> items)
+        public RutasAdapter(List<RutaMovil> items, OnRutaClickListener listener)
         {
             this.items = items;
+            this.listener = listener;
         }
 
         @NonNull
@@ -113,7 +128,15 @@ public class RutasActivity extends AppCompatActivity
             holder.lblClave.setText(item.getClave());
             holder.lblNombre.setText(item.getNombre());
             holder.lblEstado.setText(item.getEstado());
-            holder.lblDetalle.setText("Ruta activa de transporte público SCTP");
+            holder.lblDetalle.setText("Toca para ver recorrido, paradas y autobús en vivo");
+
+            holder.itemView.setOnClickListener(v ->
+            {
+                if (listener != null)
+                {
+                    listener.onRutaClick(item);
+                }
+            });
         }
 
         @Override
@@ -124,7 +147,10 @@ public class RutasActivity extends AppCompatActivity
 
         static class ViewHolder extends RecyclerView.ViewHolder
         {
-            TextView lblClave, lblNombre, lblEstado, lblDetalle;
+            TextView lblClave;
+            TextView lblNombre;
+            TextView lblEstado;
+            TextView lblDetalle;
 
             public ViewHolder(@NonNull View itemView)
             {
@@ -137,4 +163,3 @@ public class RutasActivity extends AppCompatActivity
         }
     }
 }
-

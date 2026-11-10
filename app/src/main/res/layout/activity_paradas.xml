@@ -14,9 +14,10 @@
         android:padding="16dp">
 
         <TextView
+            android:id="@+id/lblTituloRutas"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🚏 Paradas y Mapa del Valle de Toluca"
+            android:text="🚏 Red de Rutas del Valle de Toluca"
             android:textColor="#ffffff"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -29,6 +30,36 @@
             android:text="📡 Localizando GPS del dispositivo..."
             android:textColor="#cbd5e1"
             android:textSize="12sp" />
+
+        <!-- tarjeta de informacion del autobus en vivo cuando hay ruta seleccionada -->
+        <LinearLayout
+            android:id="@+id/layoutInfoAutobus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="#0f172a"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/lblRutaSeleccionada"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🚍 Monitoreo en vivo: R-01 Tianguistenco – Toluca"
+                android:textColor="#38bdf8"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/lblEstimacionLlegada"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="⏱️ Autobús Eco. 14 en camino • Llegada estimada: Calculando..."
+                android:textColor="#fde047"
+                android:textSize="12sp" />
+        </LinearLayout>
 
         <!-- selector de vista: mapa interactivo o lista -->
         <LinearLayout
