@@ -27,7 +27,7 @@
 <body>
 <div id="mapa"></div>
 <script>
-/* Puente JavaFX <-> Leaflet (OpenStreetMap con respaldo). */
+/* Puente JavaFX <-> Leaflet (OpenStreetMap / Esri sin marcas de agua de api key). */
 var mapa = null, capa = null, marcadores = {}, temporal = null, editable = false, resaltada = null, datos = [];
 var listoJava = false;
 
@@ -50,11 +50,11 @@ function iniciar() {
     zoomAnimation: false
   });
 
-  // servidor de mapas de alta velocidad cartodb / osm sin bloqueo de referer
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  // servidor de mapas gratuito openstreetmap oficial sin requerimiento de api key
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
-    subdomains: 'abcd',
-    attribution: '&copy; CartoDB &copy; OpenStreetMap'
+    subdomains: ['a', 'b', 'c'],
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(mapa);
 
   capa = L.layerGroup().addTo(mapa);
