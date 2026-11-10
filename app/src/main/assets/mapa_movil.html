@@ -49,25 +49,26 @@
             100% { transform: scale(2.4); opacity: 0; }
         }
 
-        /* marcador de autobus en movimiento */
-        .bus-marker-container {
-            position: relative;
-            width: 40px;
-            height: 40px;
-            display: flex;
+        /* insignia de autobus que avanza sobre la linea azul */
+        .bus-badge {
+            background: #b45309;
+            color: #ffffff;
+            border: 2px solid #ffffff;
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 13px;
+            font-weight: 800;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            white-space: nowrap;
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            background: #d97706;
-            border: 3px solid #ffffff;
-            border-radius: 50%;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.45);
-            font-size: 20px;
-            animation: bounceBus 2s infinite ease-in-out;
-            transition: all 0.8s ease;
+            gap: 4px;
+            animation: floatBus 1.5s infinite ease-in-out;
+            cursor: pointer;
         }
-        @keyframes bounceBus {
+        @keyframes floatBus {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-4px); }
+            50% { transform: translateY(-3px); }
         }
 
         /* marcadores de paradas sctp */
@@ -180,7 +181,7 @@
             '<div style="font-size: 11px; color: #64748b; margin-top: 2px;">' + lat.toFixed(5) + ', ' + lng.toFixed(5) + '</div>' +
             '<div class="popup-badge badge-azul">Sensor de dispositivo</div>'
         );
-        if (centrar) {
+        if (centrar && !marcadorAutobus) {
             map.flyTo(coordsUsuario, 16, { duration: 1.0 });
             marcadorUsuario.openPopup();
         }
@@ -223,12 +224,12 @@
                 var colorRuta = (idRutaFiltro === 2) ? '#047857' : '#2563eb';
                 L.polyline(puntosPolyline, {
                     color: colorRuta,
-                    weight: 5,
+                    weight: 6,
                     opacity: 0.85,
                     lineJoin: 'round'
                 }).addTo(capaRutas);
 
-                // iniciar o reiniciar simulacion de autobus en esta ruta
+                // iniciar simulacion de avance del autobus
                 iniciarSimulacionAutobus(puntosPolyline, idRutaFiltro);
             }
 
@@ -246,59 +247,80 @@
             clearInterval(timerSimulacion);
         }
 
-        // generar interpolacion suave entre paradas para simular el trayecto
-        puntosRutaActual = generarPuntosInterpolados(puntos, 25);
+        // generar 35 puntos interpolados por tramo para avance visible y fluido
+        puntosRutaActual = generarPuntosInterpolados(puntos, 35);
         pasoActual = 0;
 
         var iconoBus = L.divIcon({
-            className: 'bus-marker-container',
-            html: '🚍',
-            iconSize: [40, 40],
-            iconAnchor: [20, 20]
+            className: '',
+            html: '<div class="bus-badge">🚍 Eco. 14</div>',
+            iconSize: [110, 32],
+            iconAnchor: [55, 16]
         });
 
         if (!marcadorAutobus) {
-            marcadorAutobus = L.marker(puntosRutaActual[0], { icon: iconoBus, zIndexOffset: 2500 }).addTo(map);
+            marcadorAutobus = L.marker(puntosRutaActual[0], { icon: iconoBus, zIndexOffset: 5000 }).addTo(map);
         } else {
             marcadorAutobus.setLatLng(puntosRutaActual[0]);
             if (!map.hasLayer(marcadorAutobus)) marcadorAutobus.addTo(map);
         }
 
-        actualizarPopupAutobus(0);
+        marcadorAutobus.on('click', function() {
+            mostrarDetalleAutobus(pasoActual);
+        });
 
-        // animar avance cada 1.5 segundos
+        // actualizar estimacion inicial
+        actualizarEstimacion(0);
+
+        // animar avance cada 1 segundo (se desplaza visiblemente por la ruta)
         timerSimulacion = setInterval(function() {
             pasoActual = (pasoActual + 1) % puntosRutaActual.length;
             var pos = puntosRutaActual[pasoActual];
             marcadorAutobus.setLatLng(pos);
-            actualizarPopupAutobus(pasoActual);
-        }, 1500);
+            actualizarEstimacion(pasoActual);
+        }, 1000);
     }
 
-    function actualizarPopupAutobus(paso) {
-        if (!marcadorAutobus) return;
+    function actualizarEstimacion(paso) {
         var total = puntosRutaActual.length;
         var porcentaje = Math.round((paso / total) * 100);
         var minutosRestantes = Math.max(1, Math.round(((total - paso) / total) * 35));
 
-        // calcular hora estimada
         var ahora = new Date();
         ahora.setMinutes(ahora.getMinutes() + minutosRestantes);
         var hh = ahora.getHours().toString().padStart(2, '0');
         var mm = ahora.getMinutes().toString().padStart(2, '0');
         var horaEstimada = hh + ':' + mm;
 
-        marcadorAutobus.bindPopup(
-            '<div class="popup-titulo">🚍 Autobús Eco. 14 en ruta</div>' +
-            '<div>Trayecto completado: <b>' + porcentaje + '%</b></div>' +
-            '<div style="margin-top: 4px;">⏱️ Llegada estimada: <b>' + horaEstimada + ' (' + minutosRestantes + ' min)</b></div>' +
-            '<div class="popup-badge badge-ambar">Monitoreo GPS en vivo</div>'
-        );
+        if (marcadorAutobus && marcadorAutobus.getPopup() && marcadorAutobus.isPopupOpen()) {
+            marcadorAutobus.setPopupContent(generarHtmlPopup(porcentaje, horaEstimada, minutosRestantes));
+        }
 
-        // notificar a la cabecera android
+        // notificar al panel nativo de android
         if (window.AndroidBridge && window.AndroidBridge.notificarEstimacion) {
             window.AndroidBridge.notificarEstimacion(horaEstimada, minutosRestantes);
         }
+    }
+
+    function mostrarDetalleAutobus(paso) {
+        var total = puntosRutaActual.length;
+        var porcentaje = Math.round((paso / total) * 100);
+        var minutosRestantes = Math.max(1, Math.round(((total - paso) / total) * 35));
+
+        var ahora = new Date();
+        ahora.setMinutes(ahora.getMinutes() + minutosRestantes);
+        var hh = ahora.getHours().toString().padStart(2, '0');
+        var mm = ahora.getMinutes().toString().padStart(2, '0');
+        var horaEstimada = hh + ':' + mm;
+
+        marcadorAutobus.bindPopup(generarHtmlPopup(porcentaje, horaEstimada, minutosRestantes)).openPopup();
+    }
+
+    function generarHtmlPopup(porcentaje, hora, minutos) {
+        return '<div class="popup-titulo">🚍 Autobús Eco. 14 en ruta</div>' +
+               '<div>Trayecto recorrido: <b>' + porcentaje + '%</b></div>' +
+               '<div style="margin-top: 4px;">⏱️ Llegada estimada: <b>' + hora + ' (' + minutos + ' min)</b></div>' +
+               '<div class="popup-badge badge-ambar">Monitoreo GPS en tiempo real</div>';
     }
 
     function generarPuntosInterpolados(puntos, divisionesPorTramo) {
