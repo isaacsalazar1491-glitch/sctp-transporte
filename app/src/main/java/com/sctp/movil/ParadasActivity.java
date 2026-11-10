@@ -52,7 +52,7 @@ public class ParadasActivity extends AppCompatActivity
         ConexionMovil.ejecutar(() ->
         {
             List<ParadaMovil> resultado = new ArrayList<>();
-            String sql = "SELECT id, ruta_id, nombre, orden, minutos_desde_origen FROM parada ORDER BY orden ASC";
+            String sql = "SELECT id_parada, id_ruta, nombre, orden, minutos_desde_origen, latitud, longitud FROM parada ORDER BY orden ASC";
 
             try (Connection con = ConexionMovil.obtenerConexionDirecta();
                  PreparedStatement ps = con.prepareStatement(sql);
@@ -61,13 +61,13 @@ public class ParadasActivity extends AppCompatActivity
                 while (rs.next())
                 {
                     resultado.add(new ParadaMovil(
-                            rs.getInt("id"),
-                            rs.getInt("ruta_id"),
+                            rs.getInt("id_parada"),
+                            rs.getInt("id_ruta"),
                             rs.getString("nombre"),
                             rs.getInt("orden"),
                             rs.getInt("minutos_desde_origen"),
-                            null,
-                            null
+                            rs.getDouble("latitud"),
+                            rs.getDouble("longitud")
                     ));
                 }
             }

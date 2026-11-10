@@ -52,7 +52,7 @@ public class RutasActivity extends AppCompatActivity
         ConexionMovil.ejecutar(() ->
         {
             List<RutaMovil> resultado = new ArrayList<>();
-            String sql = "SELECT id, clave, nombre, estado FROM ruta WHERE activo = true ORDER BY clave ASC";
+            String sql = "SELECT id_ruta, clave, nombre, origen, destino, estado FROM ruta WHERE estado = 'ACTIVA' ORDER BY clave ASC";
 
             try (Connection con = ConexionMovil.obtenerConexionDirecta();
                  PreparedStatement ps = con.prepareStatement(sql);
@@ -61,7 +61,7 @@ public class RutasActivity extends AppCompatActivity
                 while (rs.next())
                 {
                     resultado.add(new RutaMovil(
-                            rs.getInt("id"),
+                            rs.getInt("id_ruta"),
                             rs.getString("clave"),
                             rs.getString("nombre"),
                             rs.getString("estado")

@@ -52,7 +52,7 @@ public class IncidenciasActivity extends AppCompatActivity
         ConexionMovil.ejecutar(() ->
         {
             List<IncidenciaMovil> resultado = new ArrayList<>();
-            String sql = "SELECT id, tipo, descripcion, severidad, fecha_hora FROM incidencia WHERE estado != 'CERRADA' ORDER BY fecha_hora DESC";
+            String sql = "SELECT id_incidencia, tipo, descripcion, severidad, fecha_hora FROM incidencia WHERE estado != 'CERRADA' ORDER BY fecha_hora DESC";
 
             try (Connection con = ConexionMovil.obtenerConexionDirecta();
                  PreparedStatement ps = con.prepareStatement(sql);
@@ -61,7 +61,7 @@ public class IncidenciasActivity extends AppCompatActivity
                 while (rs.next())
                 {
                     resultado.add(new IncidenciaMovil(
-                            rs.getInt("id"),
+                            rs.getInt("id_incidencia"),
                             rs.getString("tipo"),
                             rs.getString("descripcion"),
                             rs.getString("severidad"),
