@@ -25,28 +25,28 @@
         }
         .user-pulse-ring {
             position: absolute;
-            width: 32px;
-            height: 32px;
-            top: -4px;
-            left: -4px;
+            width: 34px;
+            height: 34px;
+            top: -5px;
+            left: -5px;
             border-radius: 50%;
             background-color: rgba(37, 99, 235, 0.45);
             animation: pulse 1.8s infinite ease-out;
         }
         .user-pulse-dot {
             position: absolute;
-            width: 16px;
-            height: 16px;
-            top: 4px;
-            left: 4px;
+            width: 18px;
+            height: 18px;
+            top: 3px;
+            left: 3px;
             border-radius: 50%;
             background-color: #2563eb;
-            border: 3px solid #ffffff;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            border: 3.5px solid #ffffff;
+            box-shadow: 0 2px 7px rgba(0,0,0,0.45);
         }
         @keyframes pulse {
             0% { transform: scale(0.6); opacity: 1; }
-            100% { transform: scale(2.3); opacity: 0; }
+            100% { transform: scale(2.4); opacity: 0; }
         }
 
         /* marcadores de paradas sctp */
@@ -101,8 +101,8 @@
 <script>
     // delimitacion para toluca, metepec, lerma y tianguistenco
     var boundsValle = L.latLngBounds(
-        [19.1000, -99.8000],
-        [19.4000, -99.4000]
+        [19.0500, -99.8500],
+        [19.4500, -99.3500]
     );
 
     // centro en toluca
@@ -110,7 +110,7 @@
 
     var map = L.map('map', {
         center: centro,
-        zoom: 13,
+        zoom: 14,
         minZoom: 10,
         maxZoom: 18,
         maxBounds: boundsValle,
@@ -119,13 +119,13 @@
         attributionControl: false
     });
 
-    // capas de mapas con soporte dual (openstreetmap y esri)
+    // capa base osm
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         subdomains: ['a', 'b', 'c']
     }).addTo(map);
 
-    // marcador de ubicacion de referencia (av. buenavista y calz. del panteon)
+    // marcador de ubicacion del usuario (gps en vivo)
     var coordsUsuario = [19.2820, -99.6360];
     var iconoUsuario = L.divIcon({
         className: 'user-pulse-container',
@@ -134,15 +134,31 @@
         iconAnchor: [12, 12]
     });
 
-    L.marker(coordsUsuario, { icon: iconoUsuario, zIndexOffset: 2000 })
+    var marcadorUsuario = L.marker(coordsUsuario, { icon: iconoUsuario, zIndexOffset: 3000 })
         .addTo(map)
         .bindPopup(
-            '<div class="popup-titulo">📍 Tu ubicacion actual</div>' +
-            '<div>Av. Buenavista y Calz. del Panteon</div>' +
-            '<div class="popup-badge badge-azul">Valle de Toluca</div>'
+            '<div class="popup-titulo">📍 Tu ubicacion real</div>' +
+            '<div id="popupTxtUbicacion">Detectando posicion GPS...</div>' +
+            '<div class="popup-badge badge-azul">En tiempo real</div>'
         );
 
     var capaParadas = L.layerGroup().addTo(map);
+
+    // actualizacion de coordenadas gps en vivo desde android
+    window.actualizarUbicacionGps = function(lat, lng, descripcion, centrar) {
+        coordsUsuario = [lat, lng];
+        marcadorUsuario.setLatLng(coordsUsuario);
+        marcadorUsuario.bindPopup(
+            '<div class="popup-titulo">📍 Tu ubicacion en tiempo real</div>' +
+            '<div>' + (descripcion || 'GPS Activo') + '</div>' +
+            '<div style="font-size: 11px; color: #64748b; margin-top: 2px;">' + lat.toFixed(5) + ', ' + lng.toFixed(5) + '</div>' +
+            '<div class="popup-badge badge-azul">Sensor de dispositivo</div>'
+        );
+        if (centrar) {
+            map.flyTo(coordsUsuario, 16, { duration: 1.0 });
+            marcadorUsuario.openPopup();
+        }
+    };
 
     // funcion llamada desde android para renderizar paradas
     window.cargarParadasJson = function(paradasJson) {
@@ -179,7 +195,6 @@
         }
     };
 
-    // funcion para forzar renderizado y recalculo de tamano en webview
     function forzarRedimension() {
         if (typeof map !== 'undefined' && map) {
             map.invalidateSize(true);

@@ -22,10 +22,11 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/lblEstadoGps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:text="Geolocalizacion satelital e itinerarios oficiales"
+            android:text="📡 Localizando GPS del dispositivo..."
             android:textColor="#cbd5e1"
             android:textSize="12sp" />
 
@@ -81,6 +82,18 @@
             android:layout_height="match_parent"
             android:padding="16dp"
             android:visibility="gone" />
+
+        <!-- boton flotante para centrar en mi ubicacion actual -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabMiUbicacion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="20dp"
+            android:backgroundTint="#2563eb"
+            android:contentDescription="Mi Ubicación"
+            android:src="@android:drawable/ic_menu_mylocation"
+            android:tint="#ffffff" />
 
         <ProgressBar
             android:id="@+id/progressBarParadas"
