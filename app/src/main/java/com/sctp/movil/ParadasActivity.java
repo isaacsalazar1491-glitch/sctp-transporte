@@ -12,11 +12,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.ConsoleMessage;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -30,6 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.sctp.movil.db.ConexionMovil;
 import com.sctp.movil.model.ParadaMovil;
+import com.sctp.movil.model.RutaMovil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -46,7 +48,7 @@ public class ParadasActivity extends AppCompatActivity
     private RecyclerView rvParadas;
     private WebView webViewMapa;
 
-    // cabecera y tabs
+    // cabecera y pestañas
     private View btnVolverAtras;
     private TextView lblTituloRutas;
     private TextView lblEstadoGps;
@@ -55,11 +57,8 @@ public class ParadasActivity extends AppCompatActivity
     private TextView lblTabMapa;
     private TextView lblTabParadas;
 
-    // selector flotante de rutas
-    private TextView btnPillRuta1;
-    private TextView btnPillRuta2;
-    private TextView btnPillRuta3;
-    private View layoutPillsRutas;
+    // selector horizontal dinamico de rutas
+    private LinearLayout layoutPillsRutas;
 
     // tarjeta de llegada del autobus
     private View layoutInfoAutobus;
@@ -70,7 +69,7 @@ public class ParadasActivity extends AppCompatActivity
     private TextView lblEstimacionLlegada;
     private View fabMiUbicacion;
 
-    // barra de navegacion inferior dock
+    // barra inferior dock
     private View btnNavHome;
     private View btnNavRutas;
     private View btnNavMapa;
@@ -81,6 +80,7 @@ public class ParadasActivity extends AppCompatActivity
     private Location ultimaUbicacion;
 
     private final List<ParadaMovil> listaParadas = new ArrayList<>();
+    private final List<RutaMovil> listaRutasDisponibles = new ArrayList<>();
     private ParadasAdapter adapter;
     private boolean mapaListo = false;
     private int idRutaFiltro = 1;
@@ -95,7 +95,7 @@ public class ParadasActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_paradas);
 
-        // obtener parametros enviados desde RutasActivity o MainActivity
+        // obtener parametros enviados desde otras actividades
         int idParam = getIntent().getIntExtra("id_ruta", 0);
         if (idParam > 0)
         {
@@ -116,11 +116,10 @@ public class ParadasActivity extends AppCompatActivity
         enlazarVistas();
         configurarWebView();
         configurarBotonesPestana();
-        configurarFiltrosRuta();
         configurarNavegacionInferior();
         configurarGps();
 
-        actualizarTextosRutaActiva();
+        cargarRutasDinamicas();
         cargarParadasDesdeServidor();
     }
 
@@ -140,9 +139,6 @@ public class ParadasActivity extends AppCompatActivity
         lblTabParadas = findViewById(R.id.lblTabParadas);
 
         layoutPillsRutas = findViewById(R.id.layoutPillsRutas);
-        btnPillRuta1 = findViewById(R.id.btnPillRuta1);
-        btnPillRuta2 = findViewById(R.id.btnPillRuta2);
-        btnPillRuta3 = findViewById(R.id.btnPillRuta3);
 
         fabMiUbicacion = findViewById(R.id.fabMiUbicacion);
         layoutInfoAutobus = findViewById(R.id.layoutInfoAutobus);
@@ -167,62 +163,154 @@ public class ParadasActivity extends AppCompatActivity
         }
     }
 
+    private void cargarRutasDinamicas()
+    {
+        ConexionMovil.ejecutar(() ->
+        {
+            List<RutaMovil> rutas = new ArrayList<>();
+            String sql = "SELECT id_ruta, clave, nombre, destino FROM ruta WHERE estado = 'ACTIVA' ORDER BY id_ruta ASC";
+
+            try (Connection con = ConexionMovil.obtenerConexionDirecta();
+                 PreparedStatement ps = con.prepareStatement(sql);
+                 ResultSet rs = ps.executeQuery())
+            {
+                while (rs.next())
+                {
+                    rutas.add(new RutaMovil(
+                            rs.getInt("id_ruta"),
+                            rs.getString("clave"),
+                            rs.getString("nombre"),
+                            rs.getString("destino")
+                    ));
+                }
+            }
+            return rutas;
+        }, new ConexionMovil.Callback<List<RutaMovil>>()
+        {
+            @Override
+            public void onSuccess(List<RutaMovil> result)
+            {
+                listaRutasDisponibles.clear();
+                listaRutasDisponibles.addAll(result);
+
+                // si la ruta activa actual no esta en la lista, seleccionar la primera
+                if (!listaRutasDisponibles.isEmpty())
+                {
+                    boolean existe = false;
+                    for (RutaMovil r : listaRutasDisponibles)
+                    {
+                        if (r.getId() == idRutaFiltro)
+                        {
+                            existe = true;
+                            nombreRutaFiltro = r.getNombre();
+                            claveRutaFiltro = r.getClave();
+                            break;
+                        }
+                    }
+                    if (!existe)
+                    {
+                        RutaMovil primera = listaRutasDisponibles.get(0);
+                        idRutaFiltro = primera.getId();
+                        nombreRutaFiltro = primera.getNombre();
+                        claveRutaFiltro = primera.getClave();
+                    }
+                }
+
+                generarPillsDinamicas();
+                actualizarTextosRutaActiva();
+            }
+
+            @Override
+            public void onError(Exception e)
+            {
+                // mantener valores por defecto si no hay conexion
+                actualizarTextosRutaActiva();
+            }
+        });
+    }
+
+    private void generarPillsDinamicas()
+    {
+        if (layoutPillsRutas == null) return;
+        layoutPillsRutas.removeAllViews();
+
+        for (RutaMovil r : listaRutasDisponibles)
+        {
+            TextView pill = new TextView(this);
+            pill.setText(r.getClave());
+            pill.setTextSize(14f);
+            pill.setTypeface(null, android.graphics.Typeface.BOLD);
+            pill.setClickable(true);
+            pill.setFocusable(true);
+
+            int padH = dpToPx(20);
+            int padV = dpToPx(9);
+            pill.setPadding(padH, padV, padH, padV);
+
+            boolean seleccionada = (r.getId() == idRutaFiltro);
+            pill.setBackgroundResource(seleccionada ? R.drawable.bg_pill_route_selected : R.drawable.bg_pill_route_unselected);
+            pill.setTextColor(seleccionada ? 0xffffffff : 0xff0f172a);
+            pill.setElevation(seleccionada ? dpToPx(3) : dpToPx(2));
+
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            lp.setMarginEnd(dpToPx(10));
+            pill.setLayoutParams(lp);
+
+            pill.setOnClickListener(v -> cambiarRutaActiva(r.getId(), r.getClave(), r.getNombre()));
+            layoutPillsRutas.addView(pill);
+        }
+    }
+
+    private int dpToPx(int dp)
+    {
+        return (int) (dp * getResources().getDisplayMetrics().density);
+    }
+
+    private void cambiarRutaActiva(int nuevoIdRuta, String nuevaClave, String nuevoNombre)
+    {
+        if (idRutaFiltro == nuevoIdRuta) return;
+        idRutaFiltro = nuevoIdRuta;
+        claveRutaFiltro = nuevaClave;
+        nombreRutaFiltro = nuevoNombre;
+
+        generarPillsDinamicas();
+        actualizarTextosRutaActiva();
+        cargarParadasDesdeServidor();
+    }
+
     private void actualizarTextosRutaActiva()
     {
-        if (idRutaFiltro == 1)
+        // buscar destino de la ruta activa
+        String destino = null;
+        for (RutaMovil r : listaRutasDisponibles)
         {
-            claveRutaFiltro = "R-01";
-            nombreRutaFiltro = "Tianguistenco – Toluca";
-            lblRutaSeleccionada.setText("Llega a Terminal Tianguistenco");
+            if (r.getId() == idRutaFiltro)
+            {
+                destino = r.getEstado(); // almacenamos el destino temporalmente en estado
+                break;
+            }
         }
-        else if (idRutaFiltro == 2)
+
+        if (destino != null && !destino.isEmpty())
         {
-            claveRutaFiltro = "R-02";
-            nombreRutaFiltro = "San Mateo – CU";
-            lblRutaSeleccionada.setText("Llega a CU Ciudad Universitaria");
+            lblRutaSeleccionada.setText("Llega a " + destino);
         }
-        else if (idRutaFiltro == 3)
+        else if (nombreRutaFiltro != null)
         {
-            claveRutaFiltro = "R-03";
-            nombreRutaFiltro = "Lerma – Terminal";
-            lblRutaSeleccionada.setText("Llega a Estación Lerma Centro");
+            lblRutaSeleccionada.setText("Llega a " + nombreRutaFiltro);
+        }
+        else
+        {
+            lblRutaSeleccionada.setText("Llega a Terminal Toluca");
         }
 
         if (busquedaDestino != null && !busquedaDestino.trim().isEmpty())
         {
             lblRutaSeleccionada.setText("Llega a " + busquedaDestino);
         }
-
-        actualizarEstiloPillsRuta();
-    }
-
-    private void actualizarEstiloPillsRuta()
-    {
-        if (btnPillRuta1 == null || btnPillRuta2 == null || btnPillRuta3 == null) return;
-
-        btnPillRuta1.setBackgroundResource(idRutaFiltro == 1 ? R.drawable.bg_pill_route_selected : R.drawable.bg_pill_route_unselected);
-        btnPillRuta1.setTextColor(idRutaFiltro == 1 ? 0xffffffff : 0xff0f172a);
-
-        btnPillRuta2.setBackgroundResource(idRutaFiltro == 2 ? R.drawable.bg_pill_route_selected : R.drawable.bg_pill_route_unselected);
-        btnPillRuta2.setTextColor(idRutaFiltro == 2 ? 0xffffffff : 0xff0f172a);
-
-        btnPillRuta3.setBackgroundResource(idRutaFiltro == 3 ? R.drawable.bg_pill_route_selected : R.drawable.bg_pill_route_unselected);
-        btnPillRuta3.setTextColor(idRutaFiltro == 3 ? 0xffffffff : 0xff0f172a);
-    }
-
-    private void configurarFiltrosRuta()
-    {
-        btnPillRuta1.setOnClickListener(v -> cambiarRutaActiva(1));
-        btnPillRuta2.setOnClickListener(v -> cambiarRutaActiva(2));
-        btnPillRuta3.setOnClickListener(v -> cambiarRutaActiva(3));
-    }
-
-    private void cambiarRutaActiva(int nuevoIdRuta)
-    {
-        if (idRutaFiltro == nuevoIdRuta) return;
-        idRutaFiltro = nuevoIdRuta;
-        actualizarTextosRutaActiva();
-        cargarParadasDesdeServidor();
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -234,6 +322,22 @@ public class ParadasActivity extends AppCompatActivity
         settings.setDatabaseEnabled(true);
         settings.setLoadWithOverviewMode(true);
         settings.setUseWideViewPort(true);
+
+        // permitir acceso de origen cruzado para consultas osrm desde assets locales
+        settings.setAllowFileAccess(true);
+        settings.setAllowContentAccess(true);
+        settings.setAllowFileAccessFromFileURLs(true);
+        settings.setAllowUniversalAccessFromFileURLs(true);
+
+        webViewMapa.setWebChromeClient(new WebChromeClient()
+        {
+            @Override
+            public boolean onConsoleMessage(ConsoleMessage consoleMessage)
+            {
+                android.util.Log.d("MAPA_JS", consoleMessage.message() + " [" + consoleMessage.sourceId() + ":" + consoleMessage.lineNumber() + "]");
+                return true;
+            }
+        });
 
         webViewMapa.addJavascriptInterface(new BridgeJS(), "AndroidBridge");
 
@@ -260,7 +364,6 @@ public class ParadasActivity extends AppCompatActivity
 
     private void configurarBotonesPestana()
     {
-        // alternar a vista mapa
         btnVerMapa.setOnClickListener(v ->
         {
             btnVerMapa.setBackgroundResource(R.drawable.bg_tab_active_yellow);
@@ -275,7 +378,6 @@ public class ParadasActivity extends AppCompatActivity
             rvParadas.setVisibility(View.GONE);
         });
 
-        // alternar a vista lista de paradas
         btnVerLista.setOnClickListener(v ->
         {
             btnVerLista.setBackgroundResource(R.drawable.bg_tab_active_yellow);
@@ -289,7 +391,6 @@ public class ParadasActivity extends AppCompatActivity
             fabMiUbicacion.setVisibility(View.GONE);
         });
 
-        // boton flotante centrar en gps
         fabMiUbicacion.setOnClickListener(v ->
         {
             if (ultimaUbicacion != null)
@@ -446,7 +547,9 @@ public class ParadasActivity extends AppCompatActivity
         ConexionMovil.ejecutar(() ->
         {
             List<ParadaMovil> resultado = new ArrayList<>();
-            String sql = "SELECT id_parada, id_ruta, nombre, orden, minutos_desde_origen, latitud, longitud FROM parada WHERE id_ruta = ? ORDER BY orden ASC";
+            // filtrar paradas con coordenadas validas de la ruta activa
+            String sql = "SELECT id_parada, id_ruta, nombre, orden, minutos_desde_origen, latitud, longitud " +
+                    "FROM parada WHERE id_ruta = ? AND latitud IS NOT NULL AND longitud IS NOT NULL ORDER BY orden ASC";
 
             try (Connection con = ConexionMovil.obtenerConexionDirecta();
                  PreparedStatement ps = con.prepareStatement(sql))
@@ -503,28 +606,34 @@ public class ParadasActivity extends AppCompatActivity
         }
 
         StringBuilder json = new StringBuilder("[");
+        boolean primero = true;
         for (int i = 0; i < listaParadas.size(); i++)
         {
             ParadaMovil p = listaParadas.get(i);
+            if (p.getLatitud() == null || p.getLongitud() == null) continue;
+
+            if (!primero)
+            {
+                json.append(",");
+            }
+            primero = false;
+
             json.append(String.format(
                     Locale.US,
                     "{\"idParada\":%d,\"idRuta\":%d,\"nombre\":\"%s\",\"orden\":%d,\"minutosDesdeOrigen\":%d,\"latitud\":%f,\"longitud\":%f}",
                     p.getId(),
                     p.getRutaId(),
-                    p.getNombre().replace("\"", "\\\""),
+                    p.getNombre().replace("\"", "\\\"").replace("'", "\\'"),
                     p.getOrden(),
                     p.getMinutosDesdeOrigen(),
-                    p.getLatitud() != null ? p.getLatitud() : 0.0,
-                    p.getLongitud() != null ? p.getLongitud() : 0.0
+                    p.getLatitud(),
+                    p.getLongitud()
             ));
-            if (i < listaParadas.size() - 1)
-            {
-                json.append(",");
-            }
         }
         json.append("]");
 
-        String script = "javascript:window.cargarParadasJson('" + json.toString().replace("'", "\\'") + "', " + idRutaFiltro + ");";
+        // inyectar directamente como objeto javascript seguro sin comillas de texto
+        String script = "javascript:window.cargarParadasJson(" + json.toString() + ", " + idRutaFiltro + ");";
         webViewMapa.evaluateJavascript(script, null);
     }
 
