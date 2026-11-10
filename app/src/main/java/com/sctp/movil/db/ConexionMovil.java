@@ -18,8 +18,9 @@ public class ConexionMovil
     private static final String DB = "backend_ruta";
     private static final String USER = "uni";
     private static final String PASS = "P4ssw0rd123106";
-    // maxResultBuffer evita que postgresql busque java.lang.management en android
-    private static final String URL = "jdbc:postgresql://" + HOST + ":" + PORT + "/" + DB + "?maxResultBuffer=100M&ssl=false";
+    // conexion jdbc para postgresql en android
+    private static final String URL = "jdbc:postgresql://" + HOST + ":" + PORT + "/" + DB
+            + "?ssl=false&sslmode=disable&gssEncMode=disable";
 
     private static final ExecutorService executor = Executors.newFixedThreadPool(4);
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -36,8 +37,9 @@ public class ConexionMovil
         Properties info = new Properties();
         info.setProperty("user", USER);
         info.setProperty("password", PASS);
-        info.setProperty("maxResultBuffer", "100M");
         info.setProperty("ssl", "false");
+        info.setProperty("sslmode", "disable");
+        info.setProperty("gssEncMode", "disable");
         info.setProperty("loginTimeout", "6");
         return DriverManager.getConnection(URL, info);
     }
@@ -54,7 +56,13 @@ public class ConexionMovil
             }
             catch (Throwable t)
             {
-                Exception ex = (t instanceof Exception) ? (Exception) t : new Exception(t.getMessage());
+                android.util.Log.e("ConexionMovil", "error en operacion sql", t);
+                String detalle = t.getMessage();
+                if (t.getCause() != null)
+                {
+                    detalle += " [Causa: " + t.getCause().getMessage() + "]";
+                }
+                Exception ex = new Exception(detalle != null ? detalle : t.toString());
                 mainHandler.post(() -> callback.onError(ex));
             }
         });
