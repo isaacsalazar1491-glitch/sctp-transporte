@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
 <style>
-  html, body, #mapa { height: 100%; margin: 0; padding: 0; background: #E4EAF4; font-family: "Segoe UI", Arial, sans-serif; }
+  html, body { width: 100%; height: 100%; margin: 0; padding: 0; background: #E4EAF4; overflow: hidden; }
+  #mapa { width: 100%; height: 100%; position: absolute; top: 0; left: 0; background: #E4EAF4; font-family: "Segoe UI", Arial, sans-serif; }
   .parada { position: relative; display: flex; align-items: center; white-space: nowrap; }
   .parada .num { box-sizing: border-box; width: 30px; height: 30px; border-radius: 50%; background: #1B64B5; color: #fff;
     border: 3.5px solid #fff; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center;
@@ -17,12 +18,16 @@
     color: #1B64B5; font-weight: 800; font-size: 20px; display: flex; align-items: center; justify-content: center; }
   .editando { cursor: crosshair !important; }
 </style>
+<!-- deshabilitar 3d transforms para webkit/javafx y evitar tiles grises o huecos -->
+<script>
+  window.L_DISABLE_3D = true;
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 </head>
 <body>
 <div id="mapa"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
-/* Puente JavaFX <-> Leaflet (OpenStreetMap). Java expone `window.java` (MapaParadas.Puente) y llama a window.sctp.* */
+/* Puente JavaFX <-> Leaflet (OpenStreetMap con respaldo). */
 var mapa = null, capa = null, marcadores = {}, temporal = null, editable = false, resaltada = null, datos = [];
 var listoJava = false;
 
@@ -37,18 +42,46 @@ window.javaListo = function () {
 
 function iniciar() {
   if (mapa) return;
-  mapa = L.map('mapa', { center: [__LAT__, __LNG__], zoom: __ZOOM__, zoomControl: true });
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  mapa = L.map('mapa', {
+    center: [__LAT__, __LNG__],
+    zoom: __ZOOM__,
+    zoomControl: true,
+    fadeAnimation: false,
+    zoomAnimation: false
+  });
+
+  // servidor de mapas de alta velocidad cartodb / osm sin bloqueo de referer
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19,
+    subdomains: 'abcd',
+    attribution: '&copy; CartoDB &copy; OpenStreetMap'
   }).addTo(mapa);
+
   capa = L.layerGroup().addTo(mapa);
+
   mapa.on('click', function (e) {
     if (!editable) return;
     ponerTemporal(e.latlng.lat, e.latlng.lng);
     window.java.clicMapa(e.latlng.lat, e.latlng.lng);
   });
+
+  // forzar redimension continua para que javafx webview nunca deje bloques en blanco
+  forzarRedimension();
+  setTimeout(forzarRedimension, 200);
+  setTimeout(forzarRedimension, 600);
+  setTimeout(forzarRedimension, 1200);
+  setTimeout(forzarRedimension, 2500);
+
   window.java.mapaListo();
 }
+
+function forzarRedimension() {
+  if (mapa) {
+    mapa.invalidateSize(true);
+  }
+}
+
+window.addEventListener('resize', forzarRedimension);
 
 function iconoParada(p) {
   var activa = p.id === resaltada;
@@ -70,7 +103,10 @@ function dibujar(ajustar) {
     marcadores[p.id] = m;
     pts.push([p.lat, p.lng]);
   });
-  if (ajustar && pts.length) mapa.fitBounds(pts, { padding: [60, 60], maxZoom: 17 });
+  if (ajustar && pts.length) {
+    mapa.fitBounds(pts, { padding: [60, 60], maxZoom: 17 });
+  }
+  forzarRedimension();
 }
 
 function ponerTemporal(lat, lng) {
@@ -97,7 +133,6 @@ window.sctp = {
     if (lat === null || lng === null) { if (temporal && mapa) mapa.removeLayer(temporal); return; }
     ponerTemporal(lat, lng);
   },
-  /* Búsqueda con Nominatim (OpenStreetMap): solo cuando el usuario la pide. */
   buscar: function (texto) {
     if (!mapa) return;
     var x = new XMLHttpRequest();
