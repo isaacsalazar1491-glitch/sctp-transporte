@@ -17,6 +17,7 @@
   .temporal { width: 34px; height: 34px; box-sizing: border-box; border-radius: 50%; background: #fff; border: 3.5px dashed #1B64B5;
     color: #1B64B5; font-weight: 800; font-size: 20px; display: flex; align-items: center; justify-content: center; }
   .editando { cursor: crosshair !important; }
+  .leaflet-tile-pane { filter: grayscale(90%) brightness(1.06) contrast(0.92); }
 </style>
 <!-- deshabilitar 3d transforms para webkit/javafx y evitar tiles grises o huecos -->
 <script>
@@ -50,7 +51,7 @@ function iniciar() {
     zoomAnimation: false
   });
 
-  // servidor de mapas gratuito openstreetmap oficial sin requerimiento de api key
+  // mapa base claro estilo positron sin marcas de agua ni distracciones
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     subdomains: ['a', 'b', 'c'],
@@ -103,10 +104,39 @@ function dibujar(ajustar) {
     marcadores[p.id] = m;
     pts.push([p.lat, p.lng]);
   });
+  if (pts.length >= 2) {
+    trazarRutaCalles(pts);
+  }
   if (ajustar && pts.length) {
     mapa.fitBounds(pts, { padding: [60, 60], maxZoom: 17 });
   }
   forzarRedimension();
+}
+
+function trazarRutaCalles(pts) {
+  var waypoints = pts.map(function(p) { return p[1].toFixed(6) + ',' + p[0].toFixed(6); }).join(';');
+  var url = 'https://router.project-osrm.org/route/v1/driving/' + waypoints + '?overview=full&geometries=geojson';
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.timeout = 4000;
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      try {
+        var d = JSON.parse(xhr.responseText);
+        if (d.code === 'Ok' && d.routes && d.routes.length > 0) {
+          var coords = d.routes[0].geometry.coordinates.map(function(c) { return [c[1], c[0]]; });
+          L.polyline(coords, { color: '#ffffff', weight: 8, opacity: 0.9, lineJoin: 'round' }).addTo(capa);
+          L.polyline(coords, { color: '#1B64B5', weight: 4.5, opacity: 0.95, lineJoin: 'round' }).addTo(capa);
+          return;
+        }
+      } catch(e) {}
+    }
+    L.polyline(pts, { color: '#1B64B5', weight: 4, opacity: 0.8, lineJoin: 'round' }).addTo(capa);
+  };
+  xhr.onerror = xhr.ontimeout = function() {
+    L.polyline(pts, { color: '#1B64B5', weight: 4, opacity: 0.8, lineJoin: 'round' }).addTo(capa);
+  };
+  xhr.send();
 }
 
 function ponerTemporal(lat, lng) {

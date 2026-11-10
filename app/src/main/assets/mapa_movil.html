@@ -12,58 +12,61 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            background-color: #cbd5e1;
+            background-color: #f1f5f9;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow: hidden;
         }
 
-        /* radar pulsante de ubicacion del usuario */
+        /* estilo positron claro y limpio sobre mapa base para destacar rutas */
+        .leaflet-tile-pane {
+            filter: grayscale(90%) brightness(1.06) contrast(0.92);
+        }
         .user-pulse-container {
             position: relative;
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
         }
         .user-pulse-ring {
             position: absolute;
-            width: 34px;
-            height: 34px;
-            top: -5px;
-            left: -5px;
+            width: 38px;
+            height: 38px;
+            top: -6px;
+            left: -6px;
             border-radius: 50%;
-            background-color: rgba(37, 99, 235, 0.45);
-            animation: pulse 1.8s infinite ease-out;
+            background-color: rgba(29, 78, 216, 0.35);
+            animation: pulse 2s infinite ease-out;
         }
         .user-pulse-dot {
             position: absolute;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             top: 3px;
             left: 3px;
             border-radius: 50%;
-            background-color: #2563eb;
+            background-color: #1d4ed8;
             border: 3.5px solid #ffffff;
-            box-shadow: 0 2px 7px rgba(0,0,0,0.45);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.35);
         }
         @keyframes pulse {
             0% { transform: scale(0.6); opacity: 1; }
             100% { transform: scale(2.4); opacity: 0; }
         }
 
-        /* insignia de autobus que avanza sobre la linea azul */
+        /* insignia de autobus que avanza sobre la linea real de calles */
         .bus-badge {
-            background: #b45309;
+            background: #0f172a;
             color: #ffffff;
-            border: 2px solid #ffffff;
+            border: 2.5px solid #facc15;
             border-radius: 20px;
-            padding: 4px 10px;
+            padding: 5px 12px;
             font-size: 13px;
             font-weight: 800;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.4);
             white-space: nowrap;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            animation: floatBus 1.5s infinite ease-in-out;
+            gap: 5px;
+            animation: floatBus 1.8s infinite ease-in-out;
             cursor: pointer;
         }
         @keyframes floatBus {
@@ -71,48 +74,48 @@
             50% { transform: translateY(-3px); }
         }
 
-        /* marcadores de paradas sctp */
+        /* marcadores de paradas sctp estilo positron claro */
         .parada-marker {
             background-color: #ffffff;
-            border: 2.5px solid #047857;
+            border: 2.5px solid #1d4ed8;
             border-radius: 50%;
-            width: 28px;
-            height: 28px;
+            width: 30px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 12.5px;
             font-weight: 800;
-            color: #064e3b;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+            color: #0f172a;
+            box-shadow: 0 2px 8px rgba(15,23,42,0.25);
         }
-        .parada-marker.ruta-1 { border-color: #2563eb; color: #1d4ed8; }
-        .parada-marker.ruta-2 { border-color: #047857; color: #064e3b; }
+        .parada-marker.ruta-1 { border-color: #1d4ed8; color: #1d4ed8; }
+        .parada-marker.ruta-2 { border-color: #059669; color: #047857; }
 
-        /* popups estilizados */
+        /* popups estilizados y limpios */
         .leaflet-popup-content-wrapper {
-            border-radius: 12px;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-            padding: 4px 6px;
-            font-size: 12px;
+            border-radius: 14px;
+            box-shadow: 0 6px 18px rgba(15,23,42,0.18);
+            padding: 6px 8px;
+            font-size: 12.5px;
         }
         .popup-titulo {
-            font-size: 13.5px;
+            font-size: 14px;
             font-weight: 800;
             color: #0f172a;
             margin-bottom: 2px;
         }
         .popup-badge {
             display: inline-block;
-            font-size: 10px;
+            font-size: 10.5px;
             font-weight: 700;
-            padding: 2px 8px;
+            padding: 3px 9px;
             border-radius: 10px;
-            margin-top: 4px;
+            margin-top: 5px;
         }
         .badge-azul { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
         .badge-verde { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
-        .badge-ambar { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+        .badge-ambar { background: #fefce8; color: #854d0e; border: 1px solid #fef08a; }
     </style>
 </head>
 <body>
@@ -122,17 +125,19 @@
 <!-- js local empaquetado de leaflet -->
 <script src="file:///android_asset/leaflet.js"></script>
 <script>
+    // limites de la zona de operacion toluca
     var boundsValle = L.latLngBounds(
         [19.0500, -99.8500],
         [19.4500, -99.3500]
     );
 
+    // centro inicial en toluca con zoom contextual cercano
     var centro = [19.2840, -99.6420];
 
     var map = L.map('map', {
         center: centro,
-        zoom: 14,
-        minZoom: 10,
+        zoom: 15,
+        minZoom: 11,
         maxZoom: 18,
         maxBounds: boundsValle,
         maxBoundsViscosity: 0.8,
@@ -140,25 +145,26 @@
         attributionControl: false
     });
 
+    // mapa base claro estilo positron sin marcas de agua ni saturacion de color
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         subdomains: ['a', 'b', 'c']
     }).addTo(map);
 
     // marcador de ubicacion del usuario (gps en vivo)
-    var coordsUsuario = [19.2820, -99.6360];
+    var coordsUsuario = [19.2840, -99.6420];
     var iconoUsuario = L.divIcon({
         className: 'user-pulse-container',
         html: '<div class="user-pulse-ring"></div><div class="user-pulse-dot"></div>',
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
+        iconSize: [26, 26],
+        iconAnchor: [13, 13]
     });
 
     var marcadorUsuario = L.marker(coordsUsuario, { icon: iconoUsuario, zIndexOffset: 3000 })
         .addTo(map)
         .bindPopup(
-            '<div class="popup-titulo">📍 Tu ubicacion real</div>' +
-            '<div id="popupTxtUbicacion">Detectando posicion GPS...</div>' +
+            '<div class="popup-titulo">📍 Tu ubicación real</div>' +
+            '<div id="popupTxtUbicacion">Detectando posición GPS...</div>' +
             '<div class="popup-badge badge-azul">En tiempo real</div>'
         );
 
@@ -170,32 +176,34 @@
     var timerSimulacion = null;
     var puntosRutaActual = [];
     var pasoActual = 0;
+    var tieneRutaActiva = false;
 
     // actualizacion de coordenadas gps en vivo desde android
     window.actualizarUbicacionGps = function(lat, lng, descripcion, centrar) {
         coordsUsuario = [lat, lng];
         marcadorUsuario.setLatLng(coordsUsuario);
         marcadorUsuario.bindPopup(
-            '<div class="popup-titulo">📍 Tu ubicacion en tiempo real</div>' +
+            '<div class="popup-titulo">📍 Tu ubicación en tiempo real</div>' +
             '<div>' + (descripcion || 'GPS Activo') + '</div>' +
             '<div style="font-size: 11px; color: #64748b; margin-top: 2px;">' + lat.toFixed(5) + ', ' + lng.toFixed(5) + '</div>' +
             '<div class="popup-badge badge-azul">Sensor de dispositivo</div>'
         );
-        if (centrar && !marcadorAutobus) {
-            map.flyTo(coordsUsuario, 16, { duration: 1.0 });
+
+        // si el usuario pide centrar y no hay ruta fija, centrar con zoom de detalle
+        if (centrar) {
+            map.flyTo(coordsUsuario, 16, { duration: 0.8 });
             marcadorUsuario.openPopup();
         }
     };
 
-    // funcion llamada desde android para renderizar paradas y trazar ruta
+    // funcion llamada desde android para renderizar paradas y trazar ruta real
     window.cargarParadasJson = function(paradasJson, idRutaFiltro) {
         try {
             var lista = typeof paradasJson === 'string' ? JSON.parse(paradasJson) : paradasJson;
             capaParadas.clearLayers();
             capaRutas.clearLayers();
 
-            var puntos = [];
-            var puntosPolyline = [];
+            var paradasFiltradas = [];
 
             lista.forEach(function(p) {
                 if (!p.latitud || !p.longitud) return;
@@ -204,8 +212,8 @@
                 var icono = L.divIcon({
                     className: 'parada-marker ruta-' + (p.idRuta || 1),
                     html: p.orden || '•',
-                    iconSize: [28, 28],
-                    iconAnchor: [14, 14]
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
                 });
 
                 var m = L.marker([p.latitud, p.longitud], { icon: icono });
@@ -215,40 +223,111 @@
                     '<div class="popup-badge badge-verde">Operando normalmente</div>'
                 );
                 m.addTo(capaParadas);
-                puntos.push([p.latitud, p.longitud]);
-                puntosPolyline.push([p.latitud, p.longitud]);
+                paradasFiltradas.push(p);
             });
 
-            // trazar linea de ruta que conecta las paradas
-            if (puntosPolyline.length >= 2) {
-                var colorRuta = (idRutaFiltro === 2) ? '#047857' : '#2563eb';
-                L.polyline(puntosPolyline, {
-                    color: colorRuta,
-                    weight: 6,
-                    opacity: 0.85,
-                    lineJoin: 'round'
-                }).addTo(capaRutas);
-
-                // iniciar simulacion de avance del autobus
-                iniciarSimulacionAutobus(puntosPolyline, idRutaFiltro);
-            }
-
-            if (puntos.length > 0) {
-                map.fitBounds(puntos, { padding: [50, 50], maxZoom: 15 });
+            if (paradasFiltradas.length >= 2) {
+                tieneRutaActiva = true;
+                // trazar ruta siguiendo las calles mediante servicio de ruteo osrm
+                obtenerGeometriaCallesOSRM(paradasFiltradas, idRutaFiltro);
+            } else if (paradasFiltradas.length === 1) {
+                var pos = [paradasFiltradas[0].latitud, paradasFiltradas[0].longitud];
+                map.setView(pos, 16);
             }
         } catch(e) {
             console.error('error al cargar paradas:', e);
         }
     };
 
-    // simulador de avance en tiempo real del autobus
+    // consulta de ruta real siguiendo calles a traves de osrm
+    function obtenerGeometriaCallesOSRM(paradas, idRutaFiltro) {
+        // construir coordenadas formato lon,lat;lon,lat;...
+        var waypoints = paradas.map(function(p) {
+            return p.longitud.toFixed(6) + ',' + p.latitud.toFixed(6);
+        }).join(';');
+
+        var urlOsrm = 'https://router.project-osrm.org/route/v1/driving/' + waypoints + '?overview=full&geometries=geojson';
+
+        var puntosDirectos = paradas.map(function(p) {
+            return [p.latitud, p.longitud];
+        });
+
+        var colorRuta = (idRutaFiltro === 2) ? '#059669' : '#1d4ed8';
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', urlOsrm, true);
+        xhr.timeout = 4000;
+
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                try {
+                    var data = JSON.parse(xhr.responseText);
+                    if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
+                        var coordsCalle = data.routes[0].geometry.coordinates.map(function(pt) {
+                            return [pt[1], pt[0]]; // convertir lon,lat a lat,lon para leaflet
+                        });
+
+                        dibujarYAnimarRuta(coordsCalle, colorRuta, idRutaFiltro);
+                        return;
+                    }
+                } catch(e) {
+                    console.error('error procesando osrm:', e);
+                }
+            }
+            // fallback en caso de error o sin conexion
+            dibujarYAnimarRuta(puntosDirectos, colorRuta, idRutaFiltro);
+        };
+
+        xhr.onerror = function() {
+            dibujarYAnimarRuta(puntosDirectos, colorRuta, idRutaFiltro);
+        };
+
+        xhr.ontimeout = function() {
+            dibujarYAnimarRuta(puntosDirectos, colorRuta, idRutaFiltro);
+        };
+
+        xhr.send();
+    }
+
+    // dibuja el trazo curvo de calles y centra en tu ubicacion + ruta activa
+    function dibujarYAnimarRuta(puntosCalle, colorRuta, idRutaFiltro) {
+        capaRutas.clearLayers();
+
+        // trazo de borde suave para resaltar sobre el fondo claro
+        L.polyline(puntosCalle, {
+            color: '#ffffff',
+            weight: 9,
+            opacity: 0.9,
+            lineJoin: 'round'
+        }).addTo(capaRutas);
+
+        // linea principal de la ruta
+        var lineaRuta = L.polyline(puntosCalle, {
+            color: colorRuta,
+            weight: 5.5,
+            opacity: 0.95,
+            lineJoin: 'round'
+        }).addTo(capaRutas);
+
+        // centrar el zoom en tu ubicacion y en la ruta activa sin alejarse al valle completo
+        var bounds = L.latLngBounds(puntosCalle);
+        if (coordsUsuario && coordsUsuario[0] && coordsUsuario[1]) {
+            bounds.extend(coordsUsuario);
+        }
+        map.fitBounds(bounds, { padding: [35, 35], maxZoom: 15 });
+
+        // iniciar la simulacion del autobus siguiendo las calles reales
+        iniciarSimulacionAutobus(puntosCalle, idRutaFiltro);
+    }
+
+    // simulador de avance en tiempo real del autobus sobre las calles
     function iniciarSimulacionAutobus(puntos, idRuta) {
         if (timerSimulacion) {
             clearInterval(timerSimulacion);
         }
 
-        // generar 35 puntos interpolados por tramo para avance visible y fluido
-        puntosRutaActual = generarPuntosInterpolados(puntos, 35);
+        // si los puntos ya provienen de osrm, tienen alta resolucion; si son directos interpolamos
+        puntosRutaActual = puntos.length > 50 ? puntos : generarPuntosInterpolados(puntos, 25);
         pasoActual = 0;
 
         var iconoBus = L.divIcon({
@@ -272,13 +351,13 @@
         // actualizar estimacion inicial
         actualizarEstimacion(0);
 
-        // animar avance cada 1 segundo (se desplaza visiblemente por la ruta)
+        // animar avance constante siguiendo la curva de las calles
         timerSimulacion = setInterval(function() {
             pasoActual = (pasoActual + 1) % puntosRutaActual.length;
             var pos = puntosRutaActual[pasoActual];
             marcadorAutobus.setLatLng(pos);
             actualizarEstimacion(pasoActual);
-        }, 1000);
+        }, 800);
     }
 
     function actualizarEstimacion(paso) {
