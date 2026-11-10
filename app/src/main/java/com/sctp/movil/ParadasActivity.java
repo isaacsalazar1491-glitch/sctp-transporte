@@ -66,6 +66,7 @@ public class ParadasActivity extends AppCompatActivity
     private int idRutaFiltro = 0;
     private String nombreRutaFiltro = null;
     private String claveRutaFiltro = null;
+    private String busquedaDestino = null;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -74,10 +75,11 @@ public class ParadasActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_paradas);
 
-        // obtener parametros enviados desde RutasActivity
+        // obtener parametros enviados desde RutasActivity o MainActivity
         idRutaFiltro = getIntent().getIntExtra("id_ruta", 0);
         nombreRutaFiltro = getIntent().getStringExtra("nombre_ruta");
         claveRutaFiltro = getIntent().getStringExtra("clave_ruta");
+        busquedaDestino = getIntent().getStringExtra("busqueda");
 
         progressBar = findViewById(R.id.progressBarParadas);
         rvParadas = findViewById(R.id.rvParadas);
@@ -98,6 +100,13 @@ public class ParadasActivity extends AppCompatActivity
             layoutInfoAutobus.setVisibility(View.VISIBLE);
             lblRutaSeleccionada.setText("🚍 Monitoreo en vivo: " + claveRutaFiltro + " " + nombreRutaFiltro);
             lblEstimacionLlegada.setText("⏱️ Autobús Eco. 14 en ruta • Calculando llegada...");
+        }
+        else if (busquedaDestino != null && !busquedaDestino.trim().isEmpty())
+        {
+            lblTituloRutas.setText("🔍 Destino: " + busquedaDestino);
+            layoutInfoAutobus.setVisibility(View.VISIBLE);
+            lblRutaSeleccionada.setText("📍 Destino buscado: " + busquedaDestino);
+            lblEstimacionLlegada.setText("⏱️ Localizando paradas y tiempos de llegada...");
         }
 
         rvParadas.setLayoutManager(new LinearLayoutManager(this));
@@ -386,6 +395,30 @@ public class ParadasActivity extends AppCompatActivity
 
         String script = "javascript:window.cargarParadasJson('" + json.toString().replace("'", "\\'") + "', " + idRutaFiltro + ");";
         webViewMapa.evaluateJavascript(script, null);
+
+        // centrar mapa si se realizo una busqueda especifica
+        if (busquedaDestino != null && !busquedaDestino.trim().isEmpty())
+        {
+            String query = busquedaDestino.toLowerCase().trim();
+            for (ParadaMovil p : listaParadas)
+            {
+                if (p.getNombre().toLowerCase().contains(query) || query.contains(p.getNombre().toLowerCase()))
+                {
+                    if (p.getLatitud() != null && p.getLongitud() != null)
+                    {
+                        String scriptCentrar = String.format(
+                                Locale.US,
+                                "javascript:if(window.map){ window.map.setView([%f, %f], 16); }",
+                                p.getLatitud(),
+                                p.getLongitud()
+                        );
+                        webViewMapa.evaluateJavascript(scriptCentrar, null);
+                        Toast.makeText(this, "Destino encontrado: " + p.getNombre(), Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     @Override
