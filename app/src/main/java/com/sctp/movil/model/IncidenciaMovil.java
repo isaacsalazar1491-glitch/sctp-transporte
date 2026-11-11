@@ -7,14 +7,21 @@ public class IncidenciaMovil
     private final String descripcion;
     private final String severidad;
     private final String fecha;
+    private final String estado;
 
     public IncidenciaMovil(int id, String tipo, String descripcion, String severidad, String fecha)
+    {
+        this(id, tipo, descripcion, severidad, fecha, "ABIERTA");
+    }
+
+    public IncidenciaMovil(int id, String tipo, String descripcion, String severidad, String fecha, String estado)
     {
         this.id = id;
         this.tipo = tipo;
         this.descripcion = descripcion;
         this.severidad = severidad;
         this.fecha = fecha;
+        this.estado = estado;
     }
 
     public int getId()
@@ -41,5 +48,9 @@ public class IncidenciaMovil
     {
         return fecha;
     }
-}
 
+    public String getEstado()
+    {
+        return estado;
+    }
+}
