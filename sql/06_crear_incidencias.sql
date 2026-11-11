@@ -90,3 +90,4 @@ SELECT (SELECT id_ruta FROM ruta ORDER BY id_ruta DESC LIMIT 1),
        'Desvío temporal por obras en tramo Ocoyoacac', 'MODERADA', 'ABIERTA', now() - INTERVAL '30 minutes', NULL
 WHERE EXISTS (SELECT 1 FROM ruta) AND EXISTS (SELECT 1 FROM unidad)
   AND (SELECT count(*) FROM incidencia) = 2;
+
